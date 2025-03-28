@@ -1,0 +1,6 @@
+node_modules
+controller
+routes
+scripts
+public
+.env

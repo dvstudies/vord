@@ -1,0 +1,22 @@
+{
+    "name": "vord-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "scripts": {
+        "open_init": "docker run -d --name opensearch -p 9200:9200 -p 9600:9600 -e \"discovery.type=single-node\" -e \"DISABLE_SECURITY_PLUGIN=true\" opensearchproject/opensearch:latest",
+        "open_start": "docker start opensearch",
+        "open_test": "curl http://localhost:9200/",
+        "start": "node server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@opensearch-project/opensearch": "^3.3.0",
+        "cors": "^2.8.5",
+        "csv-parser": "^3.2.0",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2"
+    }
+}
