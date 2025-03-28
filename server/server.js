@@ -10,14 +10,12 @@ app.use(express.json());
 
 // Allow cors for backend / frontend communication
 app.use(cors()); // Allows all origins
+
 // app.use(
 //     cors({
 //         origin: "https://neriiacopo.github.io",
 //     })
 // );
-
-// Serve static files (index.html)
-// app.use(express.static("public"));
 
 // Connect to OpenSearch client
 const OPENSEARCH_URL = process.env.OPENSEARCH_URL;
@@ -25,7 +23,6 @@ const OPENSEARCH_USER = process.env.OPENSEARCH_USER;
 const OPENSEARCH_PASS = process.env.OPENSEARCH_PASS;
 const PORT = process.env.PORT || 5000;
 
-// Connect to OpenSearch client
 const client = new Client({
     node: OPENSEARCH_URL,
     auth: {
@@ -33,6 +30,7 @@ const client = new Client({
         password: OPENSEARCH_PASS,
     },
 });
+
 app.locals.client = client;
 
 // Add all routes

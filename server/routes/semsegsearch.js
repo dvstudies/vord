@@ -71,6 +71,7 @@ router.post("/semsegsearch", async (req, res) => {
             }));
 
             console.log(enriched);
+            console.log(enriched);
 
             res.json(enriched);
         }
