@@ -1,6 +1,6 @@
 node_modules
-controller
-routes
+_wip
+controllers
 scripts
 public
 .env
