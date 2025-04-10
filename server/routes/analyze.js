@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-router.post("/semsegsearch", async (req, res) => {
+router.post("/paintings", async (req, res) => {
     const { index, embedding } = req.body;
 
     const client = req.app.locals.client;
+    console.log(client);
 
     // Validate the input
     if (!embedding || !Array.isArray(embedding) || embedding.length !== 512) {
