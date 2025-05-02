@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-router.post("/search", async (req, res) => {
+router.post("/vord", async (req, res) => {
     const { index, embedding } = req.body;
 
     const client = req.app.locals.client;

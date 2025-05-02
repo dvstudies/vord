@@ -36,12 +36,14 @@ app.locals.client = client;
 // Add all routes
 fs.readdirSync(path.join(__dirname, "routes")).forEach((file) => {
     const route = require(`./routes/${file}`);
-    app.use("/", route);
 
-    // // The following nests the endpoints based on the router filename
-    // const baseName = path.basename(file, ".js"); // e.g. "paintingsRoutes" → "paintings"
-    // const routePath = "/" + baseName.replace("Routes", "").toLowerCase(); // "/paintings"
-    // app.use(routePath, route);
+    // Flat structure
+    // app.use("/", route);
+
+    // Nested structure
+    const baseName = path.basename(file, ".js");
+    const routePath = "/" + baseName.toLowerCase();
+    app.use(routePath, route);
 });
 
 // Start server
