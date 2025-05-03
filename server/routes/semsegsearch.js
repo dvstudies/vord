@@ -1,12 +1,10 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
 
 router.post("/search", async (req, res) => {
     const { index, embedding } = req.body;
-
     const client = req.app.locals.client;
 
-    // Validate the input
     if (!embedding || !Array.isArray(embedding) || embedding.length !== 512) {
         return res
             .status(400)
@@ -29,7 +27,7 @@ router.post("/search", async (req, res) => {
             },
         });
 
-        if (index == "paintings") {
+        if (index === "paintings") {
             const results = response.body.hits.hits.map((hit) => ({
                 id: hit._id,
                 score: hit._score,
@@ -63,7 +61,6 @@ router.post("/search", async (req, res) => {
                 paintingMap[hit._source.omni_id] = hit._source;
             });
 
-            // Step 3: Attach painting data to each mask
             const enriched = masks.map((mask) => ({
                 ...(paintingMap[mask.omni_id] || null),
                 mask: mask,
@@ -77,4 +74,4 @@ router.post("/search", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "",
     "main": "server.js",
+    "type": "module",
     "scripts": {
         "open_init": "docker run -d --name opensearch -p 9200:9200 -p 9600:9600 -e \"discovery.type=single-node\" -e \"DISABLE_SECURITY_PLUGIN=true\" opensearchproject/opensearch:latest",
         "open_start": "docker start opensearch",

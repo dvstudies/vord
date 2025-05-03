@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import { sortGet, sortPost } from "../controllers/sortController.js";
+
 const router = express.Router();
 
-const { sortController } = require("../controllers/sortController.js");
+router.get("/get/analyze/sort", sortGet);
+router.post("/post/analyze/sort", sortPost);
 
-router.post("/analyze/sort", sortController);
-
-module.exports = router;
+export default router;
