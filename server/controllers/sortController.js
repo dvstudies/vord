@@ -1,11 +1,27 @@
+import { buildOpenSearchFilter } from "../utils.js";
+
 export const sortGet = async (req, res) => {
     const { index, column } = req.query;
 };
 
 export const sortPost = async (req, res) => {
     try {
-        const { column, index } = req.body;
+        const {
+            column,
+            index,
+            maxBins = 10,
+            type = "integer",
+            clauses,
+        } = req.body;
         const client = req.app.locals.client;
+
+        console.log(
+            "Received request to sort data:",
+            column,
+            index,
+            "clauses",
+            clauses
+        );
 
         if (!column || !index) {
             return res
@@ -13,12 +29,22 @@ export const sortPost = async (req, res) => {
                 .json({ error: "Unable to fetch data: undefined inputs" });
         }
 
+        const filter = buildOpenSearchFilter(clauses) || {
+            match_all: {},
+        };
         const statsResp = await client.search({
             index,
-            size: 0,
-            aggs: {
-                min_val: { min: { field: column } },
-                max_val: { max: { field: column } },
+            body: {
+                size: 0,
+                aggs: {
+                    min_val: { min: { field: column } },
+                    max_val: { max: { field: column } },
+                },
+                query: {
+                    bool: {
+                        filter,
+                    },
+                },
             },
         });
 
@@ -32,33 +58,50 @@ export const sortPost = async (req, res) => {
         }
 
         const range = max - min;
-        const bins = range < 10 ? range + 1 : 10;
+        const bins = range < maxBins ? range + 1 : maxBins;
         const interval = Math.ceil(range / bins);
 
         const histResp = await client.search({
             index,
-            size: 0,
-            aggs: {
-                century_histogram: {
+            body: {
+                size: 0,
+                aggs: {
                     histogram: {
-                        field: column,
-                        interval: interval,
+                        histogram: {
+                            field: column,
+                            interval: interval,
+                        },
+                    },
+                },
+                query: {
+                    bool: {
+                        filter,
                     },
                 },
             },
         });
 
-        const buckets = histResp.body.aggregations.century_histogram.buckets;
+        const buckets = histResp.body.aggregations.histogram.buckets;
+
+        const distribution = buckets.map((b) => {
+            let label = b.key;
+            if (type === "date") {
+                const year = new Date(b.key).getFullYear();
+                label = isNaN(year) ? null : year;
+            }
+            return {
+                value: label,
+                count: b.doc_count,
+            };
+        });
 
         res.json({
+            column,
             min,
             max,
             bins,
             interval,
-            distribution: buckets.map((b) => ({
-                bin: b.key,
-                count: b.doc_count,
-            })),
+            distribution,
         });
     } catch (err) {
         console.error("Error in histogram controller:", err);
