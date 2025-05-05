@@ -3,7 +3,8 @@ name: Deploy Vite Client to GitHub Pages
 on:
     push:
         branches:
-            - main # or 'master' if your default branch is named that
+            - "client/**"
+            - ".github/workflows/deploy-client.yml"
 
 jobs:
     build-and-deploy:
