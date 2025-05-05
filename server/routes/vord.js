@@ -1,6 +1,7 @@
 import express from "express";
 import { sortGet, sortPost } from "../controllers/sortController.js";
 import { metaSearchPost } from "../controllers/metaSearchController.js";
+import { pickChoosePost } from "../controllers/PickChooseController.js";
 import { buildOpenSearchFilter } from "../utils.js";
 
 const router = express.Router();
@@ -8,6 +9,7 @@ const router = express.Router();
 router.get("/get/analyze/sort", sortGet);
 router.post("/post/analyze/sort", sortPost);
 router.post("/post/interpret/metaSearch", metaSearchPost);
+router.post("/post/inspect/pickChoose", pickChoosePost);
 
 router.post("/post/filter", async (req, res) => {
     const { clauses } = req.body;

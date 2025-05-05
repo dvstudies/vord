@@ -9,7 +9,7 @@
         "open_start": "docker start opensearch",
         "open_test": "curl http://localhost:9200/",
         "start": "node server.js",
-        "dev": "node --watch server.js"
+        "dev": "node --watch ."
     },
     "keywords": [],
     "author": "",
