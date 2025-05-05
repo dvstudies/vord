@@ -69,7 +69,7 @@ export default function Viewport({ layout, input, canvas }) {
             {/* viewport content */}
             <Box
                 sx={{
-                    // ...fadeS,
+                    maxHeight: `calc(100% - ${theme.btnM * 8}px)`,
                     m: !layout ? "none" : `${theme.btnM * 2}px`,
                     flex: 1,
                     py: !layout ? "none" : `${theme.btnM * 2}px`,
@@ -94,7 +94,6 @@ export default function Viewport({ layout, input, canvas }) {
             <Box
                 id="canvas-column"
                 sx={{
-                    // ...fadeS,
                     width: !layout ? "100%" : ratios[layout.ratio].canvasW,
                     height: "100%",
                     // backgroundColor: "#ffffff",

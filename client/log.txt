@@ -22,7 +22,8 @@
 -   on remount: brush position is not rendered
 
 
-
+# PickChoose -----------------------------------------------------------
+-   laggy behaviour when scroll is activated or any image is selected 
 
 
 

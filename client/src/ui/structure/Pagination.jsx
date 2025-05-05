@@ -23,6 +23,7 @@ export default function Pagination() {
     const [sampleOut, setOut] = useState("...");
 
     useEffect(() => {
+        // if (!clauses || !activeFilterId) return;
         runFilterCall().then((res) => {
             console.log(res.count);
             setIn(res.count);
@@ -31,7 +32,10 @@ export default function Pagination() {
 
     useEffect(() => {
         console.log("activeclass da pagination", activeCall);
-        if (!activeCall) setOut("...");
+        // if (!activeCall) {
+        //     setOut("...");
+        //     return;
+        // }
         runFilterCall(activeCall).then((res) => {
             console.log("filtered", res.count);
             setOut(res.count);

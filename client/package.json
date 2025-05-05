@@ -7,7 +7,7 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "deploy": "gh-pages -d dist --dotfiles"
+        "deploy": "gh-pages -d dist"
     },
     "devDependencies": {
         "@vitejs/plugin-react": "^4.3.4",

@@ -41,7 +41,7 @@ body,
 }
 
 *::-webkit-scrollbar-thumb:hover {
-    background-color: #222;
+    background-color: #eeeeee;
 }
 
 .inv::-webkit-scrollbar-thumb {

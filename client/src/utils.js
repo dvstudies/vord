@@ -130,6 +130,8 @@ export async function getBackend(path, queryParams = {}) {
 export async function postBackend(path, body = {}, method = "POST") {
     const url = `${BACKEND_URL}/vord/post/${path}`;
 
+    console.log("POST URL:", url, "body", body);
+
     const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
