@@ -10,16 +10,10 @@ router.post("/post/analyze/sort", sortPost);
 router.post("/post/interpret/metaSearch", metaSearchPost);
 
 router.post("/post/filter", async (req, res) => {
-    console.log("---- Filter request ----");
-    console.log("req.headers:", req.headers);
-    console.log("req.body:", req.body);
-    console.log("client config:", req.app.locals.client.connectionPool);
-
     const { clauses } = req.body;
     const index = "paintings";
     const client = req.app.locals.client;
 
-    console.log(client._auth);
     if (!index || !clauses) {
         return res
             .status(400)
@@ -27,19 +21,16 @@ router.post("/post/filter", async (req, res) => {
     }
 
     try {
-        const filter = buildOpenSearchFilter(clauses) || {
-            match_all: {},
-        };
+        const filter = buildOpenSearchFilter(clauses);
+        const hasFilter = filter.length > 0;
+
+        console.log("Filter:", filter);
         const response = await client.search({
             index,
             body: {
                 size: 0, // Don't return hits
                 track_total_hits: true, // Ensure accurate count
-                query: {
-                    bool: {
-                        filter,
-                    },
-                },
+                query: hasFilter ? { bool: { filter } } : { match_all: {} },
             },
         });
 

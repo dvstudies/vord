@@ -4,6 +4,9 @@ export function buildOpenSearchFilter(clauses) {
         .map((clause) => {
             switch (clause.type) {
                 case "sort":
+                    if (clause.min === undefined || clause.max === undefined) {
+                        return null;
+                    }
                     return {
                         range: {
                             [clause.field]: {
@@ -17,6 +20,9 @@ export function buildOpenSearchFilter(clauses) {
                         },
                     };
                 case "metaSearch":
+                    if (clause.field === undefined || clause.cats == []) {
+                        return null;
+                    }
                     return {
                         terms: {
                             [clause.field]: clause.cats,
