@@ -6,6 +6,7 @@ import {
     ImageList,
     ImageListItem,
     IconButton,
+    Stack,
 } from "@mui/material";
 
 import { getBackend, postBackend } from "../../utils.js";
@@ -109,7 +110,12 @@ export default function PickChoose({
             theme={theme}
             optionsOn={entry}
             mainChildren={null}
-            secondaryChildren={<InfoTab entry={entry} />}
+            secondaryChildren={
+                <InfoTab
+                    entry={entry}
+                    color={color}
+                />
+            }
             fullHeight={entry !== null}
         />
     );
@@ -257,7 +263,7 @@ function ImageMagnifier({ entry, color = "blue", width = 200, height = 200 }) {
     );
 }
 
-function InfoTab({ entry }) {
+function InfoTab({ entry, color = "#ffffff" }) {
     const info = useStore((state) => state.info);
     const theme = useTheme();
 
@@ -276,7 +282,7 @@ function InfoTab({ entry }) {
         >
             <Typography
                 variant="h4"
-                sx={{ pb: 1 }}
+                sx={{ pb: 2 }}
             >
                 {entry.artwork_name}
             </Typography>
@@ -284,21 +290,38 @@ function InfoTab({ entry }) {
                 <>
                     <Typography
                         variant="h5"
-                        sx={{ pb: 0 }}
+                        sx={{ pb: 4 }}
                     >
                         {entry.artist_full_name}
                     </Typography>
 
                     {info.slice(3).map((column, index) => (
-                        <Typography
-                            as="p"
+                        <Stack
                             key={index}
+                            sx={{ flex: "column" }}
                         >
-                            <br />
-                            {column.replace("_", " ")}:<br />
-                            {entry[column]}
-                            <br />
-                        </Typography>
+                            <Typography
+                                as="p"
+                                sx={{ pb: 0, color: color }}
+                            >
+                                {column.replace("_", " ")}
+                            </Typography>
+                            <Typography
+                                as="p"
+                                sx={{ pb: 2 }}
+                            >
+                                {entry[column]}
+                            </Typography>
+                        </Stack>
+                        // <Typography
+                        //     as="p"
+                        //     key={index}
+                        // >
+                        //     <br />
+                        //     {column.replace("_", " ")}:<br />
+                        //     {entry[column]}
+                        //     <br />
+                        // </Typography>
                     ))}
                     <Box
                         sx={{

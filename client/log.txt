@@ -8,10 +8,9 @@
 
 # STRUCTURE ###################################################################
 
--   Remove from config {columns}, replace with a call to the server
--   Do we need the columns[index]? or should we stay at main meta?
-
--   Force a cascade re-trigger when changing clauses 
+-   Remove from config {columns}, replace with a call to the server 🔵 
+-   Do we need the columns[index]? or should we stay at main meta? 🔴
+-   Force a cascade re-trigger when changing clauses 🔴
 
 
 # DropdownMany -----------------------------------------------------------------
@@ -24,6 +23,7 @@
 
 # PickChoose -----------------------------------------------------------
 -   laggy behaviour when scroll is activated or any image is selected 
+-   abstract component and export them - clean file
 
 
 
