@@ -3,7 +3,7 @@ import express from "express";
 import { buildOpenSearchFilter } from "../utils.js";
 import { sortPost } from "../controllers/sortController.js";
 import { metaSearchPost } from "../controllers/metaSearchController.js";
-import { pickChoosePost } from "../controllers/PickChooseController.js";
+import { pickChoosePost } from "../controllers/pickChooseController.js";
 import { colorWheelController } from "../controllers/colorWheelController.js";
 
 const router = express.Router();
