@@ -4,7 +4,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 console.log("Backend URL:", BACKEND_URL);
 
-// icons -------------------------------------------------------------------------------------------
+// icons ------------------------------------------------------------------------------------------
 import InterpretIcon from "@mui/icons-material/ManageSearch";
 // '@mui/icons-material/Category';
 import AnalyzeIcon from "@mui/icons-material/Functions";
