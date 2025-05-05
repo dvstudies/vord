@@ -13,7 +13,7 @@
                 "artwork_name": { "type": "text" },
                 "artist_full_name": { "type": "text" },
                 "artist_first_name": { "type": "text" },
-                "artist_last_name": { "type": "text" },
+                "artist_last_name": { "type": "keyword" },
                 "creation_year": {
                     "type": "date",
                     "format": "yyyy"

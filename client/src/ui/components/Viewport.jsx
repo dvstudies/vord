@@ -82,10 +82,9 @@ export default function Viewport({ layout, input, canvas }) {
                     borderRadius: theme.brdRad,
                     border: !layout ? "none" : `solid 1px ${layout.color}`,
 
-                    backgroundColor: opacifyColor(
-                        theme.palette.extra.analyze,
-                        0.4
-                    ),
+                    backgroundColor: !layout
+                        ? "none"
+                        : opacifyColor(layout.color, 0.4),
 
                     backdropFilter: "blur(5px)",
                 }}
