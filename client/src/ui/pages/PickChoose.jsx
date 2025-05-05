@@ -31,7 +31,7 @@ export default function PickChoose({
     const [entry, setEntry] = useState(metadata.entry || null);
     const [filter, setFilter] = useState(metadata.filter || { ids: new Set() });
     const [data, setData] = useState(metadata.data || []);
-    const increment = 100;
+    const increment = 40;
     const [visibleItemsCount, setVisibleItemsCount] = useState(
         metadata.visibleItemsCount || increment
     );

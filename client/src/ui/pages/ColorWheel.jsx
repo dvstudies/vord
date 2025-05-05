@@ -49,8 +49,19 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
             // size: 4000,
             clauses: clauses,
         }).then((res) => {
-            console.log("res", res);
-            setData(res);
+            const converted = res.map((d) => {
+                const hex = d.dominant_color;
+                const hsl = tinycolor(hex).toHsl();
+                return {
+                    ...d,
+                    hue: hsl.h,
+                    saturation: hsl.s,
+                    lightness: hsl.l,
+                };
+            });
+
+            console.log("converted data with hue:", converted);
+            setData(converted);
         });
     }, [selected]);
 
