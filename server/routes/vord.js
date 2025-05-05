@@ -1,13 +1,16 @@
 import express from "express";
-import { sortGet, sortPost } from "../controllers/sortController.js";
+
+import { buildOpenSearchFilter } from "../utils.js";
+import { sortPost } from "../controllers/sortController.js";
 import { metaSearchPost } from "../controllers/metaSearchController.js";
 import { pickChoosePost } from "../controllers/PickChooseController.js";
-import { buildOpenSearchFilter } from "../utils.js";
+import { colorWheelController } from "../controllers/colorWheelController.js";
 
 const router = express.Router();
 
-router.get("/get/analyze/sort", sortGet);
+// router.get("/get/analyze/sort", sortGet);
 router.post("/post/analyze/sort", sortPost);
+router.post("/post/analyze/colorWheel", colorWheelController);
 router.post("/post/interpret/metaSearch", metaSearchPost);
 router.post("/post/inspect/pickChoose", pickChoosePost);
 

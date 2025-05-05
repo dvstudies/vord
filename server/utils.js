@@ -3,25 +3,25 @@ export function buildOpenSearchFilter(clauses) {
 
     if (!Array.isArray(clauses)) return null;
 
-    // Prioritize `pickChoose` clauses if present and valid
-    const pickChooseFilters = clauses
-        .filter(
-            (clause) =>
-                clause.type === "pickChoose" &&
-                clause.field &&
-                Array.isArray(clause.ids) &&
-                clause.ids.length > 0
-        )
-        .map((clause) => ({
-            terms: {
-                [clause.field]: clause.ids,
-            },
-        }));
+    // // Prioritize `pickChoose` clauses if present and valid --- avoid for cascade
+    // const pickChooseFilters = clauses
+    //     .filter(
+    //         (clause) =>
+    //             clause.type === "pickChoose" &&
+    //             clause.field &&
+    //             Array.isArray(clause.ids) &&
+    //             clause.ids.length > 0
+    //     )
+    //     .map((clause) => ({
+    //         terms: {
+    //             [clause.field]: clause.ids,
+    //         },
+    //     }));
 
-    if (pickChooseFilters.length > 0) {
-        console.log("Using only pickChoose filters:", pickChooseFilters);
-        return pickChooseFilters;
-    }
+    // if (pickChooseFilters.length > 0) {
+    //     console.log("Using only pickChoose filters:", pickChooseFilters);
+    //     return pickChooseFilters;
+    // }
 
     return clauses
         .map((clause) => {
@@ -49,6 +49,27 @@ export function buildOpenSearchFilter(clauses) {
                     return {
                         terms: {
                             [clause.field]: clause.cats,
+                        },
+                    };
+
+                case "pickChoose":
+                    if (clause.field === undefined || clause.ids.length == 0) {
+                        return null;
+                    }
+                    return {
+                        terms: {
+                            [clause.field]: clause.ids,
+                        },
+                    };
+
+                // TO DO limit  based on deghex
+                case "colorWheel":
+                    if (clause.field === undefined || clause.ids.length == 0) {
+                        return null;
+                    }
+                    return {
+                        terms: {
+                            [clause.field]: clause.ids,
                         },
                     };
                 default:

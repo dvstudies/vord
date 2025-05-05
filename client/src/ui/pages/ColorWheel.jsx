@@ -7,6 +7,7 @@ import { useStore } from "../../store/useStore";
 
 import Viewport from "../components/Viewport.jsx";
 import InputPanel from "../components/InputPanel.jsx";
+import DropdownMenu from "../components/DropdownMenu.jsx";
 import FilterInput from "../components/FilterInput.jsx";
 import ColorChart from "../components/ColorChart.jsx";
 
@@ -15,11 +16,18 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
     const ratio = "column"; // or "square"
     const clauses = useStore((state) => state.clauses);
 
-    const [selected, setSelected] = useState(metadata.selected || "");
+    const [selected, setSelected] = useState(metadata.selected || "hue");
     const [filter, setFilter] = useState(
         metadata.filter || { min: "", max: "" }
     );
     const [data, setData] = useState(metadata.data || []);
+
+    const columns = ["hue", "saturation", "brightness"];
+
+    const options = columns.map((label) => ({
+        label: label,
+        value: label,
+    }));
 
     function resetClause() {
         call = { type: call.type };
@@ -38,10 +46,10 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
         postBackend(config.api, {
             index: config.componentIndex,
             column: selected,
-            maxBins: 100,
-            type: columnType,
+            // size: 4000,
             clauses: clauses,
         }).then((res) => {
+            console.log("res", res);
             setData(res);
         });
     }, [selected]);
@@ -78,7 +86,16 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
                 color={color}
                 theme={theme}
                 optionsOn={selected}
-                mainChildren={<></>}
+                mainChildren={
+                    <DropdownMenu
+                        label="Choose an option"
+                        color={color}
+                        options={options}
+                        value={selected}
+                        // onChange={(e) => setSelected(e.target.value)}
+                        onChange={(e) => setSelected("hue")} /// FORCE ONLY HUE DEV
+                    />
+                }
                 secondaryChildren={
                     <>
                         <Stack

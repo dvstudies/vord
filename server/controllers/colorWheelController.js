@@ -1,8 +1,8 @@
 import { buildOpenSearchFilter } from "../utils.js";
 
-export const pickChoosePost = async (req, res) => {
+export const colorWheelController = async (req, res) => {
     try {
-        const { index, clauses, size = 20 } = req.body;
+        const { index, clauses, size = 3000 } = req.body;
         const client = req.app.locals.client;
 
         console.log(
