@@ -131,6 +131,7 @@ theme = createTheme(theme, {
         gridLineStyle: {
             stroke: theme.palette.grey.darker,
             strokeWidth: 1,
+            strokeDasharray: "2,5",
         },
         line: {
             stroke: theme.palette.white.main,

@@ -11,7 +11,7 @@ import { scaleOrdinal, scaleLinear } from "@visx/scale";
 
 import { opacifyColor } from "../../utils";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
-import TooltipCard from "./TooltipCard"; // <-- your updated one
+import TooltipCard from "./TooltipCard";
 
 export default function FlatTreemap({ data, color = "#fefefe", onClick }) {
     const distribution = data?.distribution ?? [];

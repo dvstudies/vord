@@ -25,19 +25,16 @@ export default function Pagination() {
     useEffect(() => {
         // if (!clauses || !activeFilterId) return;
         runFilterCall().then((res) => {
-            console.log(res.count);
             setIn(res.count);
         });
     }, [clauses, activeFilterId]);
 
     useEffect(() => {
-        console.log("activeclass da pagination", activeCall);
         // if (!activeCall) {
         //     setOut("...");
         //     return;
         // }
         runFilterCall(activeCall).then((res) => {
-            console.log("filtered", res.count);
             setOut(res.count);
         });
     }, [activeCall, activeFilterId]);

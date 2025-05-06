@@ -15,6 +15,13 @@ export function remapNumber(value, inputRange, outputRange) {
     return scaledValue;
 }
 
+export function polarToCartesian(angleDeg, radius) {
+    const angleRad = (angleDeg - 90) * (Math.PI / 180);
+    return {
+        x: radius * Math.cos(angleRad),
+        y: radius * Math.sin(angleRad),
+    };
+}
 export function randomColorDistance(color, n, distance) {
     const hexToHsv = (hex) => {
         let r = 0,
@@ -221,6 +228,39 @@ export const useChartLayout = (
         brushInnerWidth,
         brushInnerHeight,
     };
+};
+
+// Utilities color chart
+// utils.js
+export const normalizeAngle = (deg) => (deg + 360) % 360;
+
+export const computeBrushArc = (pivot, clickAngle) => {
+    let diff = Math.abs(clickAngle - pivot);
+    if (diff > 180) diff = 360 - diff;
+
+    if (diff < 5) return [0, 360];
+
+    let start = normalizeAngle(pivot - diff);
+    let end = normalizeAngle(pivot + diff);
+
+    if (start > end) start -= 360;
+
+    return [start, end];
+};
+
+export const getAngleFromMouse = (e, margin) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left - rect.width / 2;
+    const mouseY = e.clientY - rect.top - rect.height / 2;
+
+    const angle = (Math.atan2(mouseX, -mouseY) * 180) / Math.PI;
+    return (angle + 360) % 360;
+};
+
+export const isInArc = (hue, [start, end]) => {
+    return start < end
+        ? hue >= start && hue <= end
+        : hue >= start || hue <= end;
 };
 
 // import Papa from "papaparse";

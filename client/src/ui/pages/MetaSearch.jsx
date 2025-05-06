@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import { useEffect, useState, useCallback } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import {
     getBackend,
     postBackend,
@@ -126,6 +126,12 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                 }
                 secondaryChildren={
                     <>
+                        <Typography
+                            as="p"
+                            sx={{ pb: 0, color: color }}
+                        >
+                            Labels
+                        </Typography>
                         <Stack
                             flex={1}
                             direction="row"

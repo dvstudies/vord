@@ -8,6 +8,7 @@ import {
     LineSeries,
     TooltipProvider,
     buildChartTheme,
+    Tooltip,
 } from "@visx/xychart";
 import { curveMonotoneX } from "@visx/curve";
 import { LinearGradient } from "@visx/gradient";
@@ -174,7 +175,7 @@ export default function BrushedXYChart({
                                 stroke={color}
                             />
 
-                            <TooltipCard color={color} />
+                            <TooltipXY color={color} />
                         </XYChart>
 
                         <BrushChart
@@ -194,5 +195,32 @@ export default function BrushedXYChart({
                 );
             }}
         </ParentSize>
+    );
+}
+
+function TooltipXY({ color }) {
+    const theme = useTheme();
+
+    return (
+        <Tooltip
+            showVerticalCrosshair
+            snapTooltipToDatumX
+            snapTooltipToDatumY
+            showDatumGlyph
+            glyphStyle={{
+                fill: color,
+                stroke: theme.palette.white.main,
+                strokeWidth: 1.5,
+            }}
+            renderTooltip={({ tooltipData }) => {
+                const datum = tooltipData?.nearestDatum?.datum;
+                return datum ? (
+                    <TooltipCard
+                        vals={datum}
+                        color={color}
+                    />
+                ) : null;
+            }}
+        />
     );
 }

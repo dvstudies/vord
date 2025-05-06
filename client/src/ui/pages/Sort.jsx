@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import { useEffect, useState, useCallback } from "react";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { shadows } from "@mui/system";
 
 import { postBackend } from "../../utils.js";
@@ -97,6 +97,12 @@ export default function Sort({ color, config, schema, metadata, call }) {
                 }
                 secondaryChildren={
                     <>
+                        <Typography
+                            as="p"
+                            sx={{ pb: 0, color: color }}
+                        >
+                            Domain
+                        </Typography>
                         <Stack
                             direction="row"
                             spacing={2}

@@ -1,167 +1,262 @@
-import React, { useMemo, useCallback } from "react";
+// RadialColorWheel.jsx
+import { useTheme } from "@mui/material/styles";
+import { useState, useMemo, useEffect } from "react";
+import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
-import { Circle } from "@visx/shape";
-import { useTooltip, TooltipWithBounds } from "@visx/tooltip";
-import { localPoint } from "@visx/event";
+import { Circle, Line } from "@visx/shape";
 
-import { hexToHsv } from "../../utils";
+import {
+    polarToCartesian,
+    getAngleFromMouse,
+    computeBrushArc,
+    isInArc,
+} from "../../utils.js";
+import TooltipCard from "./TooltipCard.jsx";
+import BrushRadial from "./BrushRadial.jsx";
+import { useStore } from "../../store/useStore";
 
-const size = 600;
-const buffer = 50;
-const radius = size / 2;
+export default function RadialColorWheel({
+    data = [],
+    color = "#fff",
+    onFilter,
+    initialBrushAngles = [0, 360],
+    domainL = [0, 1],
+    domainS = [0, 1],
+}) {
+    const theme = useTheme();
+    const { chartS, tooltipS } = theme;
+    const margin = chartS.margin || {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20,
+    };
 
-export default function ColorChart({ data, handleHover = null }) {
-    const { tooltipData, tooltipLeft, tooltipTop, showTooltip, hideTooltip } =
-        useTooltip();
+    const info = useStore((state) => state.info);
 
-    const points = useMemo(() => {
-        if (!data) return [];
-        return data.map((d, i) => {
-            const [h, s, v] = hexToHsv(d.dominant_color);
-            const angle = (h * Math.PI) / 180;
-            const x = Math.cos(angle) * radius * (s / 100) + radius;
-            const y = Math.sin(angle) * radius * (s / 100) + radius;
-            return {
-                id: i,
-                x,
-                y,
-                color: d.dominant_color,
-                meta: d,
-            };
+    const [hoveredDatum, setHoveredDatum] = useState(null);
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [brushAngles, setBrushAngles] = useState(initialBrushAngles);
+    const [pivot, setPivot] = useState(0);
+
+    const filteredData = useMemo(() => {
+        return data.filter((d) => {
+            const h = d.hue;
+            const s = d.saturation;
+            const l = d.lightness;
+
+            if (
+                s < Number(domainS[0]) ||
+                s > Number(domainS[1]) ||
+                l < Number(domainL[0]) ||
+                l > Number(domainL[1])
+            ) {
+                return false;
+            }
+
+            return isInArc(h, brushAngles);
         });
-    }, [data]);
+    }, [data, brushAngles, domainL, domainS]);
 
-    const handleMouseOver = useCallback(
-        (event, point) => {
-            const coords = localPoint(event);
-            showTooltip({
-                tooltipLeft: coords.x,
-                tooltipTop: coords.y,
-                tooltipData: point,
+    useEffect(() => {
+        if (filteredData.length > 0 && brushAngles.length > 0) {
+            console.log("Filtered data", filteredData);
+            console.log("Brush angles", brushAngles);
+            onFilter({
+                range: brushAngles.map((angle) => Number(angle).toFixed(2)),
+                ids: filteredData.map((d) => d._id),
             });
-            if (handleHover) handleHover(point.id);
-        },
-        [showTooltip, handleHover]
-    );
+        } else {
+            onFilter({ range: [0, 360], ids: [] });
+        }
+    }, [filteredData]);
 
     return (
-        <>
-            <svg
-                width={size}
-                height={size}
-                style={{
-                    position: "absolute",
-                    left: `${-size / 2}px`,
-                    top: `${-size / 2}px`,
-                    zIndex: 3,
-                }}
-            >
-                <Group>
-                    {points.map((point, idx) => (
-                        <Circle
-                            key={idx}
-                            cx={point.x}
-                            cy={point.y}
-                            r={3}
-                            fill="black"
-                            onMouseMove={(e) => handleMouseOver(e, point)}
-                            onMouseLeave={hideTooltip}
-                            style={{ cursor: "pointer" }}
-                        />
-                    ))}
-                </Group>
-            </svg>
+        <ParentSize>
+            {({ width, height }) => {
+                if (width === 0 || height === 0) return null;
 
-            {/* Color wheel background */}
-            <div
-                style={{
-                    zIndex: 0,
-                    position: "absolute",
-                    left: `${-size / 2}px`,
-                    top: `${-size / 2}px`,
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    borderRadius: "100%",
-                    overflow: "hidden",
-                    pointerEvents: "none",
-                }}
-            >
-                <img
-                    src="./colorwheel.jpg"
-                    loading="lazy"
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "contain",
-                        pointerEvents: "none",
-                    }}
-                />
-            </div>
+                const innerWidth = width - margin.left - margin.right;
+                const innerHeight = height - margin.top - margin.bottom;
+                const cx = innerWidth / 2;
+                const cy = innerHeight / 2;
+                const rMax = Math.min(cx, cy);
 
-            {/* Dashed compass overlay */}
-            <Compass
-                size={size}
-                buffer={buffer}
-            />
+                const rScale = scaleLinear({
+                    domain: [0, 1],
+                    range: [0, rMax],
+                });
 
-            {/* Tooltip */}
-            {tooltipData && (
-                <TooltipWithBounds
-                    top={tooltipTop}
-                    left={tooltipLeft}
-                    style={{
-                        backgroundColor: "white",
-                        padding: 12,
-                        border: "1px solid #ccc",
-                        maxWidth: 220,
-                    }}
-                >
-                    <div style={{ marginBottom: 8 }}>
-                        <img
-                            src={tooltipData.meta.image_url}
-                            style={{
-                                width: "100%",
-                                maxHeight: "150px",
-                                objectFit: "contain",
-                            }}
-                            alt="Artwork"
-                        />
-                    </div>
-                    <div>
-                        <strong>{tooltipData.meta.artwork_name}</strong>
-                        <br />
-                        {tooltipData.meta.artist_full_name}
-                    </div>
-                </TooltipWithBounds>
-            )}
-        </>
+                return (
+                    <svg
+                        width={width}
+                        height={height}
+                    >
+                        <Group
+                            top={margin.top}
+                            left={margin.left}
+                        >
+                            <Group
+                                top={cy}
+                                left={cx}
+                            >
+                                {/* // Bush */}
+                                <BrushRadial
+                                    center={{ cx, cy }}
+                                    color={color}
+                                    radius={rMax}
+                                    innerRadius={rMax - 50}
+                                    brushAngles={brushAngles}
+                                    pivot={pivot}
+                                />
+
+                                {/* // Action ring */}
+                                <Circle
+                                    cx={0}
+                                    cy={0}
+                                    r={rMax + 100}
+                                    fill="transparent"
+                                    onMouseDown={(e) => {
+                                        const start = getAngleFromMouse(
+                                            e,
+                                            margin
+                                        );
+                                        setPivot(start);
+                                    }}
+                                    onMouseUp={(e) => {
+                                        const angle = getAngleFromMouse(
+                                            e,
+                                            margin
+                                        );
+                                        setBrushAngles(
+                                            computeBrushArc(pivot, angle)
+                                        );
+                                    }}
+                                    style={{ cursor: "crosshair" }}
+                                />
+
+                                {/* Grid  */}
+                                <RadialGrid
+                                    rMax={rMax}
+                                    color={color}
+                                    subdivs={5}
+                                />
+
+                                {data.map((d, i) => {
+                                    // if (!data.active) return null;
+                                    const { hue, saturation, dominant_color } =
+                                        d;
+                                    const radius = rScale(saturation);
+                                    const { x, y } = polarToCartesian(
+                                        hue,
+                                        radius
+                                    );
+
+                                    return (
+                                        <Circle
+                                            key={i}
+                                            cx={x}
+                                            cy={y}
+                                            r={0.5}
+                                            fill={color}
+                                            stroke="none"
+                                            opacity={0.5}
+                                            style={{ pointerEvents: "none" }}
+                                        />
+                                    );
+                                })}
+
+                                {filteredData.map((d, i) => {
+                                    const { hue, saturation, dominant_color } =
+                                        d;
+                                    const radius = rScale(saturation);
+                                    const { x, y } = polarToCartesian(
+                                        hue,
+                                        radius
+                                    );
+
+                                    return (
+                                        <Circle
+                                            key={i}
+                                            cx={x}
+                                            cy={y}
+                                            r={4}
+                                            fill={dominant_color}
+                                            stroke={theme.palette.white.main}
+                                            strokeWidth={0.1}
+                                            onMouseOver={(e) => {
+                                                setHoveredDatum(d);
+                                                setMousePos({
+                                                    x: e.clientX,
+                                                    y: e.clientY,
+                                                });
+                                            }}
+                                            onMouseOut={() =>
+                                                setHoveredDatum(null)
+                                            }
+                                            style={{ cursor: "pointer" }}
+                                        />
+                                    );
+                                })}
+                            </Group>
+                        </Group>
+
+                        {hoveredDatum && (
+                            <foreignObject
+                                x={mousePos.x - width / 2}
+                                y={mousePos.y - 50}
+                                width={200}
+                                height={"100%"}
+                                pointerEvents="none"
+                            >
+                                <TooltipCard
+                                    vals={info
+                                        .slice(0, 2)
+                                        .reduce((acc, column) => {
+                                            acc[column] = hoveredDatum[column];
+                                            return acc;
+                                        }, {})}
+                                    color={color}
+                                    image={hoveredDatum.image_url}
+                                />
+                            </foreignObject>
+                        )}
+                    </svg>
+                );
+            }}
+        </ParentSize>
     );
 }
 
-function Compass({ size, buffer }) {
-    const radius = (size + buffer) / 2;
+function RadialGrid({ rMax, color, subdivs = 5 }) {
+    const theme = useTheme();
+    const { chartS } = theme;
+
     return (
-        <svg
-            width={size + buffer}
-            height={size + buffer}
-            style={{
-                position: "absolute",
-                left: `${-radius}px`,
-                top: `${-radius}px`,
-                zIndex: 0,
-                cursor: "pointer",
-            }}
-        >
-            <circle
-                cx={radius}
-                cy={radius}
-                r={(size + buffer) / 2}
+        <>
+            <Circle
+                cx={0}
+                cy={0}
+                r={rMax}
                 fill="none"
-                stroke="#ebebeb"
-                strokeWidth={2}
-                strokeDasharray="2, 2"
+                stroke={color}
             />
-        </svg>
+            {[...Array(subdivs - 1)].map((_, i) => {
+                const radius = rMax * ((i + 1) / subdivs);
+                return (
+                    <Circle
+                        key={`grid-${i}`}
+                        cx={0}
+                        cy={0}
+                        r={radius}
+                        fill="none"
+                        stroke={chartS.gridLineStyle.stroke}
+                        strokeWidth={chartS.gridLineStyle.strokeWidth}
+                        strokeDasharray={chartS.gridLineStyle.strokeDasharray}
+                    />
+                );
+            })}
+        </>
     );
 }

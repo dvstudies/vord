@@ -25,14 +25,6 @@ export default function BrushChart({
             width={width}
             height={height}
         >
-            <PatternLines
-                id="brush_pattern"
-                height={8}
-                width={8}
-                stroke={color}
-                strokeWidth={1}
-                orientation={["diagonal"]}
-            />
             <Group
                 top={brushMargin.top}
                 left={brushMargin.left}

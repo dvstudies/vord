@@ -38,7 +38,7 @@ export const colorWheelController = async (req, res) => {
             hit._source._index = hit._index;
         });
 
-        console.log("Output:", output);
+        // console.log("Output:", output);
         res.json(output.map((hit) => hit._source));
     } catch (err) {
         console.error("Error in pickChoose:", err);
