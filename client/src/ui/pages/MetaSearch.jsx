@@ -161,7 +161,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                                             ) {
                                                 const updatedDistribution =
                                                     prevData.distribution.map(
-                                                        (item) =>
+                                                        (item, index) =>
                                                             index == i
                                                                 ? {
                                                                       ...item,
@@ -180,7 +180,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                                             } else {
                                                 const updatedDistribution =
                                                     prevData.distribution.map(
-                                                        (item) =>
+                                                        (item, index) =>
                                                             index == i
                                                                 ? {
                                                                       ...item,
