@@ -25,7 +25,8 @@
 -   laggy behaviour when scroll is activated or any image is selected 
 -   abstract component and export them - clean file
 
-
+# About --------------------------------------------------------------
+for the about fetch the readme from the vord repo parent
 
 
 

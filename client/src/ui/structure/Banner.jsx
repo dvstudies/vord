@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+
 import { Box, Typography, IconButton, Modal } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
@@ -6,21 +8,32 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
 import { CollectionsBookmarkRounded } from "@mui/icons-material";
 
+import GitHubIcon from "@mui/icons-material/GitHub";
+
 export default function Banner() {
     const theme = useTheme();
     const imgPath = "V_logo.png";
     const btns = [
-        { icon: <InfoOutlinedIcon />, text: "About", fn: <ContentAbout /> },
         {
             icon: <HelpOutlineOutlinedIcon />,
-            text: "Help",
-            fn: <ContentHelp />,
+            text: "About",
+            fn: <ContentAbout />,
+            modal: true,
+        },
+
+        {
+            icon: <GitHubIcon />,
+            text: "Repo",
+            modal: false,
+            fn: () =>
+                window.open("https://github.com/dvstudies/vord", "_blank"),
         },
         // {
         //     icon: <StorageOutlinedIcon />,
         //     text: "Database",
         //     fn: <ContentDatabase />,
         // },
+        ,
     ];
 
     const [open, setOpen] = useState(false);
@@ -40,7 +53,7 @@ export default function Banner() {
         transform: "translate(-50%, -50%)",
         width: "60%",
         height: "60%",
-        bgcolor: "black",
+        // bgcolor: "black",
         color: "white",
         border: "2px solid #999",
         padding: "50px",
@@ -90,7 +103,9 @@ export default function Banner() {
                     >
                         <IconButton
                             sx={{ height: "100%", width: "100%" }}
-                            onClick={(e, id = i) => handleOpen(id)}
+                            onClick={(e, id = i) =>
+                                btn.modal ? handleOpen(id) : btn.fn(e, id)
+                            }
                         >
                             {btn.icon}
                         </IconButton>
@@ -104,7 +119,13 @@ export default function Banner() {
                     aria-describedby="modal-modal-description"
                 >
                     <Box
-                        sx={modalS}
+                        sx={{
+                            ...modalS,
+                            backgroundColor: "rgba(0,0,0,0.5)",
+
+                            opacity: 1,
+                            backdropFilter: "blur(30px)",
+                        }}
                         className="inv"
                     >
                         {content &&
@@ -122,106 +143,74 @@ export default function Banner() {
 
 function ContentAbout() {
     const theme = useTheme();
-    return (
-        <Box
-            sx={{
-                width: "100%",
-            }}
-        >
-            <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-            >
-                The following is a template for the About section
-            </Typography>
-            <Typography
-                id="modal-modal-description"
-                sx={{ mt: 2 }}
-            >
-                Visual Open Research Data
-                <br />
-                <br />
-                VORD aims to enhance our understanding of cultural heritage by
-                extracting quantitative information from vast artistic and
-                visual cultural heritage databases. Utilizing advanced machine
-                learning models, our project focuses on automatically extracting
-                various visual features, including color analysis, figure
-                positioning, and interpreting the dense embedding space of these
-                images. By combining different models, we enable comprehensive
-                visual quantitative semantic analysis, expanding the breadth of
-                art historical questions and offering new perspectives on art
-                historical narratives. This approach shifts the focus from
-                analyzing full images to detailed object semantic analysis,
-                exploiting inherent formalistic information that is otherwise
-                invisible. Our methodology enhances the transparency and
-                interpretability of machine learning models applied to cultural
-                heritage data, making them more accessible for researchers,
-                curators, and educators. The project highlights the potential of
-                combining advanced machine learning techniques with structured
-                semantic information to improve the analysis and understanding
-                of art historical content. This approach facilitates the sharing
-                of metadata in common file formats, promoting reuse and
-                interoperability, and complements existing methodologies without
-                addressing interoperability issues between legacy database
-                systems and data ontologies.
-            </Typography>
-        </Box>
-    );
-}
+    const [content, setContent] = useState(null);
 
-function ContentHelp() {
+    useEffect(() => {
+        fetch("./about.md")
+            .then((res) => res.text())
+            .then((text) => setContent(text));
+    }, []);
     return (
         <Box
             sx={{
                 width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
             }}
         >
-            <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
+            <ReactMarkdown
+                components={{
+                    h1: ({ ...props }) => (
+                        <Typography
+                            variant="h1"
+                            {...props}
+                            sx={{
+                                textAlign: "center",
+                                mt: "5vh",
+                                color: theme.palette.white.main,
+                            }}
+                        />
+                    ),
+                    h2: ({ ...props }) => (
+                        <Typography
+                            variant="h2"
+                            {...props}
+                            sx={{
+                                textAlign: "center",
+                                mx: 20,
+                                mt: theme.bannerH,
+                                color: theme.palette.white.main,
+                            }}
+                        />
+                    ),
+                    h3: ({ ...props }) => (
+                        <Typography
+                            variant="h3"
+                            {...props}
+                            sx={{
+                                mt: theme.bannerH,
+                                color: theme.palette.white.main,
+                            }}
+                        />
+                    ),
+                    p: ({ ...props }) => (
+                        <Typography
+                            variant="body1"
+                            {...props}
+                            sx={{
+                                textAlign: "justify",
+                                m: "1em 0",
+                                mx: 3,
+                                color: theme.palette.white.main,
+                            }}
+                        />
+                    ),
+                }}
             >
-                The following is a template for the About section
-            </Typography>
-        </Box>
-    );
-}
-
-function ContentDatabase() {
-    return (
-        <Box
-            sx={{
-                width: "100%",
-            }}
-        >
-            <Typography
-                id="modal-modal-title"
-                variant="h6"
-                component="h2"
-            >
-                The following is a template for the Database section
-            </Typography>
-            <Typography
-                id="modal-modal-description"
-                sx={{ mt: 2 }}
-            >
-                Here the information about the processed database should be
-                reported.
-                <br />
-                <br />
-                Lots of numbers
-                <br />
-                Lots of numbers
-                <br />
-                Lots of numbers
-                <br />
-                Lots of numbers
-                <br />
-                Lots of numbers
-                <br />
-                Lots of numbers
-            </Typography>
+                {content}
+            </ReactMarkdown>
         </Box>
     );
 }
