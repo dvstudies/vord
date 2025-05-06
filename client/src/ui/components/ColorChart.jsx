@@ -36,6 +36,7 @@ export default function RadialColorWheel({
     const info = useStore((state) => state.info);
 
     const [hoveredDatum, setHoveredDatum] = useState(null);
+    const [clickedData, setClickedData] = useState([]);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [brushAngles, setBrushAngles] = useState(initialBrushAngles);
     const [pivot, setPivot] = useState(0);
@@ -61,8 +62,6 @@ export default function RadialColorWheel({
 
     useEffect(() => {
         if (filteredData.length > 0 && brushAngles.length > 0) {
-            console.log("Filtered data", filteredData);
-            console.log("Brush angles", brushAngles);
             onFilter({
                 range: brushAngles.map((angle) => Number(angle).toFixed(2)),
                 ids: filteredData.map((d) => d._id),
@@ -183,8 +182,14 @@ export default function RadialColorWheel({
                                             cy={y}
                                             r={4}
                                             fill={dominant_color}
+                                            strokeWidth={
+                                                hoveredDatum === d
+                                                    ? 10
+                                                    : clickedData.includes(d)
+                                                    ? 2
+                                                    : 0.1
+                                            }
                                             stroke={theme.palette.white.main}
-                                            strokeWidth={0.1}
                                             onMouseOver={(e) => {
                                                 setHoveredDatum(d);
                                                 setMousePos({
@@ -195,6 +200,24 @@ export default function RadialColorWheel({
                                             onMouseOut={() =>
                                                 setHoveredDatum(null)
                                             }
+                                            onClick={(e) => {
+                                                if (clickedData.includes(d)) {
+                                                    setClickedData(
+                                                        clickedData.filter(
+                                                            (item) => item !== d
+                                                        )
+                                                    );
+                                                } else {
+                                                    d.mousePos = {
+                                                        x: mousePos.x,
+                                                        y: mousePos.y,
+                                                    };
+                                                    setClickedData([
+                                                        ...clickedData,
+                                                        d,
+                                                    ]);
+                                                }
+                                            }}
                                             style={{ cursor: "pointer" }}
                                         />
                                     );
@@ -202,10 +225,47 @@ export default function RadialColorWheel({
                             </Group>
                         </Group>
 
+                        {clickedData.map((datum, index) => (
+                            <foreignObject
+                                key={index}
+                                x={datum.mousePos.x - width / 2 + 100 + 20}
+                                y={datum.mousePos.y - margin.top + 20 + 8}
+                                width={200}
+                                height={"100%"}
+                                pointerEvents="none"
+                            >
+                                <TooltipCard
+                                    vals={info
+                                        .slice(0, 2)
+                                        .reduce((acc, column) => {
+                                            acc[column] = datum[column];
+                                            return acc;
+                                        }, {})}
+                                    color={color}
+                                    image={datum.image_url}
+                                    onToolipClick={(inside) => {
+                                        console.log(
+                                            "inside",
+                                            inside,
+                                            "datum",
+                                            datum
+                                        );
+                                        setClickedData(
+                                            clickedData.filter(
+                                                (e) => e !== datum
+                                            )
+                                        );
+                                    }}
+                                />
+                            </foreignObject>
+                        ))}
+
                         {hoveredDatum && (
                             <foreignObject
-                                x={mousePos.x - width / 2}
-                                y={mousePos.y - 50}
+                                // x={mousePos.x - width / 2 + 100 + 20}
+                                // y={mousePos.y - 40}
+                                x={mousePos.x - width / 2 + 100 + 20}
+                                y={mousePos.y - margin.top + 20 + 8}
                                 width={200}
                                 height={"100%"}
                                 pointerEvents="none"

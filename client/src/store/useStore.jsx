@@ -14,6 +14,7 @@ const filterSchema = {
 export let useStore = create((set, get) => ({
     actionBtns,
     columns,
+    mainViewProperties: {},
 
     schema: null,
     actionsHistory: [],

@@ -1,22 +1,34 @@
 import ReactMarkdown from "react-markdown";
 
 import { Box, Typography, IconButton, Modal } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTheme } from "@mui/material/styles";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import StorageOutlinedIcon from "@mui/icons-material/StorageOutlined";
 import { CollectionsBookmarkRounded } from "@mui/icons-material";
 
+import { useStore } from "../../store/useStore";
+
 import GitHubIcon from "@mui/icons-material/GitHub";
 
 export default function Banner() {
     const theme = useTheme();
+    const activeFilterId = useStore((state) => state.activeFilterId);
+    const mainViewProperties = useStore(
+        (state) =>
+            state.mainViewProperties || { width: 0, height: 0, left: 0, top: 0 }
+    );
+
+    // const filtersHistory = useStore.getState().filtersHistory;
+    // const filtersHistory = useStore((state) => state.filtersHistory);
+
     const imgPath = "V_logo.png";
     const btns = [
         {
             icon: <HelpOutlineOutlinedIcon />,
             text: "About",
+            onCLick: (e, i) => handleOpen(i),
             fn: <ContentAbout />,
             modal: true,
         },
@@ -25,8 +37,12 @@ export default function Banner() {
             icon: <GitHubIcon />,
             text: "Repo",
             modal: false,
-            fn: () =>
-                window.open("https://github.com/dvstudies/vord", "_blank"),
+            onCLick: (e, i) => {
+                handleOpen(i);
+                window.open("https://github.com/dvstudies/vord", "_blank");
+            },
+
+            fn: <></>,
         },
         // {
         //     icon: <StorageOutlinedIcon />,
@@ -36,31 +52,49 @@ export default function Banner() {
         ,
     ];
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
     const [content, setContent] = useState(null);
 
+    // useEffect(() => {
+    //     if (mainViewProperties) {
+    //         setOpen(true);
+    //         setContent(1);
+    //         useStore.setState({ modalOn: true });
+    //     }
+    // }, [mainViewProperties]);
+
+    function reset() {
+        setOpen(false);
+        setContent(null);
+        useStore.setState({ modalOn: false });
+    }
+
     const handleOpen = (id) => {
-        setContent(id + 1);
-        setOpen(true);
+        if (content == id + 1) {
+            reset();
+        } else {
+            setOpen(true);
+            setContent(id + 1);
+            useStore.setState({ modalOn: true });
+        }
     };
+
+    useEffect(() => {
+        reset();
+    }, [activeFilterId]);
 
     const handleClose = () => setOpen(false);
 
     const modalS = {
         position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "60%",
-        height: "60%",
-        // bgcolor: "black",
-        color: "white",
-        border: "2px solid #999",
+        ...mainViewProperties,
+
         padding: "50px",
         borderRadius: theme.brdRad,
-        boxShadow: 24,
         p: 4,
         overflow: "auto",
+        pointerEvents: "auto",
+        zIndex: 10,
     };
 
     return (
@@ -103,28 +137,20 @@ export default function Banner() {
                     >
                         <IconButton
                             sx={{ height: "100%", width: "100%" }}
-                            onClick={(e, id = i) =>
-                                btn.modal ? handleOpen(id) : btn.fn(e, id)
-                            }
+                            // onClick={(e, id = i) =>
+                            //     btn.modal ? handleOpen(id) : btn.fn(e, id)
+                            // }
+                            onClick={(e, id = i) => btn.onCLick(e, id)}
                         >
                             {btn.icon}
                         </IconButton>
                     </Box>
                 ))}
 
-                <Modal
-                    open={open}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
-                >
+                {open && (
                     <Box
                         sx={{
                             ...modalS,
-                            backgroundColor: "rgba(0,0,0,0.5)",
-
-                            opacity: 1,
-                            backdropFilter: "blur(30px)",
                         }}
                         className="inv"
                     >
@@ -135,7 +161,7 @@ export default function Banner() {
                                 }
                             })}
                     </Box>
-                </Modal>
+                )}
             </Box>
         </>
     );
@@ -144,6 +170,14 @@ export default function Banner() {
 function ContentAbout() {
     const theme = useTheme();
     const [content, setContent] = useState(null);
+
+    const firstParagraphRendered = useRef(false);
+
+    const firstS = {
+        mb: 15,
+        mx: 20,
+        textAlign: "center",
+    };
 
     useEffect(() => {
         fetch("./about.md")
@@ -158,6 +192,9 @@ function ContentAbout() {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
+
+                my: 10,
+                mb: 20,
             }}
         >
             <ReactMarkdown
@@ -195,18 +232,25 @@ function ContentAbout() {
                             }}
                         />
                     ),
-                    p: ({ ...props }) => (
-                        <Typography
-                            variant="body1"
-                            {...props}
-                            sx={{
-                                textAlign: "justify",
-                                m: "1em 0",
-                                mx: 3,
-                                color: theme.palette.white.main,
-                            }}
-                        />
-                    ),
+                    p: ({ ...props }) => {
+                        const isFirst = !firstParagraphRendered.current;
+                        if (isFirst) firstParagraphRendered.current = true;
+
+                        return (
+                            <Typography
+                                variant="body1"
+                                {...props}
+                                sx={{
+                                    m: "1em 0",
+                                    mx: 10,
+                                    mb: 5,
+                                    textAlign: "justify",
+                                    color: theme.palette.white.main,
+                                    ...(isFirst ? firstS : {}),
+                                }}
+                            />
+                        );
+                    },
                 }}
             >
                 {content}

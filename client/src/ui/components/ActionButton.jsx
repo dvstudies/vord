@@ -10,6 +10,8 @@ export default function ActionButton() {
     const addBtn = useStore((state) => state.addBtn);
     const addFilter = useStore((state) => state.addFilter);
     const actionBtns = useStore((state) => state.actionBtns);
+    const actionBtnFocus = useStore((state) => state.actionBtnFocus);
+    const activeFilterId = useStore((state) => state.activeFilterId);
 
     const [showSubActions, setShowSubActions] = useState(null);
     const [showCategories, setShowCategories] = useState(false);
@@ -25,6 +27,11 @@ export default function ActionButton() {
         setShowSubActions(id);
     };
 
+    const reset = () => {
+        setShowCategories(false);
+        setShowSubActions(null);
+    };
+
     // Trigger a blur effect on the canvas
     useEffect(() => {
         if (showCategories) {
@@ -33,6 +40,17 @@ export default function ActionButton() {
             useStore.setState({ actionBtnFocus: false });
         }
     }, [showCategories]);
+
+    // Reset on modal click or change in button
+    useEffect(() => {
+        if (!actionBtnFocus) {
+            reset();
+        }
+    }, [actionBtnFocus]);
+
+    useEffect(() => {
+        reset();
+    }, [activeFilterId]);
 
     // // Mouse out event - conflicting with toggle
     // useEffect(() => {
@@ -73,7 +91,7 @@ export default function ActionButton() {
                     ref={actionButtonRef}
                     sx={{
                         position: "absolute",
-                        zIndex: 10,
+                        zIndex: 1000,
                         top: 0,
                         left: `${theme.btnH + theme.btnM * 3 + 2}px`,
                         display: "flex",

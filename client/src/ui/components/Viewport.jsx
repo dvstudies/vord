@@ -1,21 +1,18 @@
+import { useRef, useEffect } from "react";
 import { Grid, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import { useStore } from "../../store/useStore";
 import { opacifyColor } from "../../utils.js";
 
+import About from "../pages/About.jsx";
+
 export default function Viewport({ layout, input, canvas }) {
     const theme = useTheme();
     const actionBtnFocus = useStore((state) => state.actionBtnFocus);
-
-    const timeDuration = 0.3;
-
-    const fadeS = {
-        opacity: actionBtnFocus ? 0 : 1,
-        // filter: actionBtnFocus ? "blur(2px)" : "blur(0)",
-        // boxShadow: actionBtnFocus ? "none" : "inherit",
-        transition: `all ${timeDuration}s ease-out`,
-    };
+    const filtersHistory = useStore((state) => state.filtersHistory);
+    const mainViewRef = useRef(null);
+    const modalOn = useStore((state) => state.modalOn);
 
     const ratios = {
         column: {
@@ -28,8 +25,22 @@ export default function Viewport({ layout, input, canvas }) {
         },
     };
 
+    useEffect(() => {
+        if (mainViewRef.current) {
+            useStore.setState({
+                mainViewProperties: {
+                    width: mainViewRef.current.offsetWidth - theme.btnM * 7,
+                    height: mainViewRef.current.offsetHeight - theme.btnM * 7,
+                    top: mainViewRef.current.offsetTop,
+                    left: mainViewRef.current.offsetLeft,
+                },
+            });
+        }
+    }, [mainViewRef]);
+
     return (
         <Box
+            ref={mainViewRef}
             sx={{
                 ...theme.viewportS,
 
@@ -49,22 +60,30 @@ export default function Viewport({ layout, input, canvas }) {
             // className="holomorphic"
         >
             {/* white modal for transition */}
-            <Box
+            {/* <Box
                 sx={{
                     position: "absolute",
-                    width: "1000vw",
-                    height: "100vh",
-                    backgroundColor: "rgba(0,0,0,0.5)",
+                    width: "100%",
+                    height: "100%",
+                    // width: "1000vw",
+                    // height: "100vh",
 
-                    opacity: !actionBtnFocus ? 0 : 1,
-                    backdropFilter: !actionBtnFocus
-                        ? "blur(0px)"
-                        : "blur(10px)",
-                    transition: `all ${timeDuration}s ease-out`,
-                    zIndex: 1,
-                    pointerEvents: !actionBtnFocus ? "none" : "auto",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    ...fadeS,
                 }}
-            ></Box>
+            >
+            </Box> */}
+            <ModalLayered
+                zIndex={9}
+                bool={modalOn}
+                blur={100}
+            />
+            <ModalLayered
+                zIndex={100}
+                bool={actionBtnFocus}
+            />
 
             {/* viewport content */}
             <Box
@@ -107,5 +126,29 @@ export default function Viewport({ layout, input, canvas }) {
                 {canvas}
             </Box>
         </Box>
+    );
+}
+
+function ModalLayered({ zIndex, bool, timeDuration = 0.3, blur = 10 }) {
+    return (
+        <Box
+            sx={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                opacity: bool ? 1 : 0,
+                backdropFilter: bool ? `blur(${blur}px)` : "blur(0px)",
+                backgroundColor: "rgba(0, 0, 0, 0.2)",
+                // ? "rgba(0, 0, 0, 0.2)"
+                // : "rgba(10,10,10, 0.2)",
+                zIndex: zIndex,
+                pointerEvents: bool ? "auto" : "none",
+                transition: `all ${timeDuration}s ease-out`,
+            }}
+            onClick={() => useStore.setState({ actionBtnFocus: false })}
+        ></Box>
     );
 }

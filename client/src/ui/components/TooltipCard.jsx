@@ -1,7 +1,12 @@
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
-export default function TooltipCard({ vals = {}, color, image = null }) {
+export default function TooltipCard({
+    vals = {},
+    color,
+    image = null,
+    onToolipClick,
+}) {
     const theme = useTheme();
 
     return (
@@ -21,11 +26,18 @@ export default function TooltipCard({ vals = {}, color, image = null }) {
                 maxWidth: 300,
                 maxHeight: 400,
                 overflowY: "auto",
-                pointerEvents: "none",
+
+                pointerEvents: "auto",
                 userSelect: "none",
                 WebkitUserSelect: "none",
                 MozUserSelect: "none",
                 msUserSelect: "none",
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (onToolipClick) {
+                    onToolipClick();
+                }
             }}
         >
             {image && (
