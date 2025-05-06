@@ -38,7 +38,8 @@ export default function Banner() {
             text: "Repo",
             modal: false,
             onCLick: (e, i) => {
-                handleOpen(i);
+                reset();
+
                 window.open("https://github.com/dvstudies/vord", "_blank");
             },
 

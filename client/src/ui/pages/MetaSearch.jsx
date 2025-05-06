@@ -154,22 +154,84 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                                     value={d.active}
                                     onToggle={(val) => {
                                         setData((prevData) => {
-                                            const updatedDistribution =
-                                                prevData.distribution.map(
-                                                    (item, index) =>
-                                                        index === i
-                                                            ? {
-                                                                  ...item,
-                                                                  active: val,
-                                                              }
-                                                            : item
-                                                );
-                                            return {
-                                                ...prevData,
-                                                distribution:
-                                                    updatedDistribution,
-                                            };
+                                            if (
+                                                prevData.distribution.filter(
+                                                    (item) => item.active
+                                                ).length === filter.cats.length
+                                            ) {
+                                                const updatedDistribution =
+                                                    prevData.distribution.map(
+                                                        (item) =>
+                                                            index == i
+                                                                ? {
+                                                                      ...item,
+                                                                      active: true,
+                                                                  }
+                                                                : {
+                                                                      ...item,
+                                                                      active: false,
+                                                                  }
+                                                    );
+                                                return {
+                                                    ...prevData,
+                                                    distribution:
+                                                        updatedDistribution,
+                                                };
+                                            } else {
+                                                const updatedDistribution =
+                                                    prevData.distribution.map(
+                                                        (item) =>
+                                                            index == i
+                                                                ? {
+                                                                      ...item,
+                                                                      active: !item.active,
+                                                                  }
+                                                                : item
+                                                    );
+                                                if (
+                                                    updatedDistribution.filter(
+                                                        (item) => item.active
+                                                    ).length === 0
+                                                ) {
+                                                    const resetDistribution =
+                                                        prevData.distribution.map(
+                                                            (item) => ({
+                                                                ...item,
+                                                                active: true,
+                                                            })
+                                                        );
+                                                    return {
+                                                        ...prevData,
+                                                        distribution:
+                                                            resetDistribution,
+                                                    };
+                                                } else {
+                                                    return {
+                                                        ...prevData,
+                                                        distribution:
+                                                            updatedDistribution,
+                                                    };
+                                                }
+                                            }
                                         });
+
+                                        // setData((prevData) => {
+                                        //     const updatedDistribution =
+                                        //         prevData.distribution.map(
+                                        //             (item, index) =>
+                                        //                 index === i
+                                        //                     ? {
+                                        //                           ...item,
+                                        //                           active: val,
+                                        //                       }
+                                        //                     : item
+                                        //         );
+                                        //     return {
+                                        //         ...prevData,
+                                        //         distribution:
+                                        //             updatedDistribution,
+                                        //     };
+                                        // });
                                     }}
                                     color={d.color}
                                     theme={theme}
@@ -191,17 +253,63 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                         data={data}
                         color={color}
                         onClick={(label) => {
+                            console.log(
+                                "prevData",
+                                data,
+                                "filter",
+                                filter,
+                                "cats",
+                                filter.cats
+                            );
                             setData((prevData) => {
-                                const updatedDistribution =
-                                    prevData.distribution.map((item) =>
-                                        item.label === label
-                                            ? { ...item, active: !item.active }
-                                            : item
-                                    );
-                                return {
-                                    ...prevData,
-                                    distribution: updatedDistribution,
-                                };
+                                if (
+                                    prevData.distribution.filter(
+                                        (item) => item.active
+                                    ).length === filter.cats.length
+                                ) {
+                                    const updatedDistribution =
+                                        prevData.distribution.map((item) =>
+                                            item.label === label
+                                                ? { ...item, active: true }
+                                                : { ...item, active: false }
+                                        );
+                                    return {
+                                        ...prevData,
+                                        distribution: updatedDistribution,
+                                    };
+                                } else {
+                                    const updatedDistribution =
+                                        prevData.distribution.map((item) =>
+                                            item.label === label
+                                                ? {
+                                                      ...item,
+                                                      active: !item.active,
+                                                  }
+                                                : item
+                                        );
+                                    if (
+                                        updatedDistribution.filter(
+                                            (item) => item.active
+                                        ).length === 0
+                                    ) {
+                                        const resetDistribution =
+                                            prevData.distribution.map(
+                                                (item) => ({
+                                                    ...item,
+                                                    active: true,
+                                                })
+                                            );
+                                        return {
+                                            ...prevData,
+                                            distribution: resetDistribution,
+                                        };
+                                    } else {
+                                        return {
+                                            ...prevData,
+                                            distribution: updatedDistribution,
+                                        };
+                                    }
+                                }
                             });
                         }}
                     />
