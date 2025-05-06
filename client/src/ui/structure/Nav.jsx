@@ -6,7 +6,8 @@ import { useStore } from "../../store/useStore.jsx";
 
 import ActionButton from "../components/ActionButton.jsx";
 import CollectionsIcon from "@mui/icons-material/StorageOutlined";
-import RemoveIcon from "@mui/icons-material/DeleteOutline";
+import RemoveIcon from "@mui/icons-material/Remove";
+import ResetIcon from "@mui/icons-material/DeleteOutline";
 
 export default function Nav() {
     const theme = useTheme();
@@ -15,6 +16,7 @@ export default function Nav() {
     const setActiveFilter = useStore((state) => state.setActiveFilter);
 
     const resetFilters = useStore((state) => state.resetFilters);
+    const removeLastFilter = useStore((state) => state.removeLastFilter);
 
     const mainContainerRef = useRef(null);
     const shadowRef = useRef(null);
@@ -102,9 +104,24 @@ export default function Nav() {
                     >
                         <IconButton
                             sx={{ height: "100%", width: "100%" }}
-                            onClick={resetFilters}
+                            onClick={removeLastFilter}
                         >
                             <RemoveIcon />
+                        </IconButton>
+                    </Box>
+                </Box>
+                <Box>
+                    <Box
+                        sx={{
+                            ...theme.btnS,
+                        }}
+                        className="holomorphic"
+                    >
+                        <IconButton
+                            sx={{ height: "100%", width: "100%" }}
+                            onClick={resetFilters}
+                        >
+                            <ResetIcon />
                         </IconButton>
                     </Box>
                 </Box>

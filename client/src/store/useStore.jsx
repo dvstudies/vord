@@ -145,24 +145,37 @@ export let useStore = create((set, get) => ({
             };
         }),
 
-    removeLastFilter: () =>
-        set((state) => ({
-            filtersHistory: state.filtersHistory.slice(0, -1),
-            activeFilterId:
-                state.activeFilterId >= state.filtersHistory.length - 1
-                    ? null
-                    : state.activeFilterId,
-            activeFilter:
-                state.activeFilterId >= state.filtersHistory.length - 1
-                    ? null
-                    : state.filtersHistory[state.activeFilterId],
-        })),
+    removeLastFilter: () => {
+        set((state) => {
+            const newFiltersHistory = state.filtersHistory.slice(0, -1);
+            const newActiveFilterId = newFiltersHistory.length - 1;
+
+            return {
+                filtersHistory: newFiltersHistory,
+                activeFilterId:
+                    newActiveFilterId >= 0 ? newActiveFilterId : null,
+                activeFilter:
+                    newActiveFilterId >= 0
+                        ? newFiltersHistory[newActiveFilterId]
+                        : null,
+                activeCall:
+                    newActiveFilterId >= 0
+                        ? newFiltersHistory[newActiveFilterId].call
+                        : null,
+                clauses: newFiltersHistory.map((filter) => filter.call),
+                sample: { in: null, out: null },
+            };
+        });
+    },
 
     resetFilters: () => {
         set(() => ({
             filtersHistory: [],
             activeFilterId: null,
             activeFilter: null,
+            activeCall: null,
+            clauses: [],
+            sample: { in: null, out: null },
         }));
     },
 
