@@ -1,4 +1,4 @@
-import { buildOpenSearchFilter } from "../utils.js";
+import { buildOpenSearchFilter } from "../utils/utils.js";
 
 export const sortGet = async (req, res) => {
     const { index, column } = req.query;
@@ -32,6 +32,7 @@ export const sortPost = async (req, res) => {
         const filter = buildOpenSearchFilter(clauses) || {
             match_all: {},
         };
+
         const statsResp = await client.search({
             index,
             body: {

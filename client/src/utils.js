@@ -1,4 +1,12 @@
 import { BACKEND_URL } from "./store/config";
+import {
+    pipeline,
+    AutoTokenizer,
+    CLIPTextModelWithProjection,
+    AutoProcessor,
+    CLIPVisionModelWithProjection,
+    RawImage,
+} from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
 
 export function remapNumber(value, inputRange, outputRange) {
     const [inputMin, inputMax] = inputRange;
@@ -22,6 +30,7 @@ export function polarToCartesian(angleDeg, radius) {
         y: radius * Math.sin(angleRad),
     };
 }
+
 export function randomColorDistance(color, n, distance) {
     const hexToHsv = (hex) => {
         let r = 0,
@@ -107,7 +116,6 @@ export function randomColorDistance(color, n, distance) {
     }
     return colors;
 }
-export function randomColor(color, n, distance) {}
 
 export function opacifyColor(color, opacity) {
     const hexToRgb = (hex) => {
@@ -148,31 +156,6 @@ export async function postBackend(path, body = {}, method = "POST") {
     if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
     return await res.json();
 }
-
-// //////////////////// utilites store
-// import { useState, useEffect } from "react";
-
-// export function usePersistedState(key, initialValue) {
-//     const [state, setState] = useState(() => {
-//         try {
-//             const persisted = localStorage.getItem(key);
-//             return persisted !== null ? JSON.parse(persisted) : initialValue;
-//         } catch (error) {
-//             console.error(`Error reading localStorage key "${key}":`, error);
-//             return initialValue;
-//         }
-//     });
-
-//     useEffect(() => {
-//         try {
-//             localStorage.setItem(key, JSON.stringify(state));
-//         } catch (error) {
-//             console.error(`Error setting localStorage key "${key}":`, error);
-//         }
-//     }, [key, state]);
-
-//     return [state, setState];
-// }
 
 ////////////////// utilities charts
 import { scaleLinear } from "@visx/scale";
@@ -231,7 +214,6 @@ export const useChartLayout = (
 };
 
 // Utilities color chart
-// utils.js
 export const normalizeAngle = (deg) => (deg + 360) % 360;
 
 export const computeBrushArc = (pivot, clickAngle) => {
@@ -263,39 +245,7 @@ export const isInArc = (hue, [start, end]) => {
         : hue >= start || hue <= end;
 };
 
-// import Papa from "papaparse";
-
-// export async function loadCSVData(filePath, header = false) {
-//     return new Promise((resolve, reject) => {
-//         Papa.parse(filePath, {
-//             download: true,
-//             header: header,
-//             skipEmptyLines: true,
-//             dynamicTyping: true,
-
-//             complete: (result) => {
-//                 if (result.data) {
-//                     resolve(result.data);
-//                 } else {
-//                     reject(new Error("Failed to parse CSV file."));
-//                 }
-//             },
-//             error: (error) => {
-//                 reject(error);
-//             },
-//         });
-//     });
-// }
-
-// export function sortParallellyArr(sortingArr, sortedArr) {
-//     const ix = sortingArr.map((x, i) => i);
-//     ix.sort((a, b) => sortingArr[a] - sortingArr[b]);
-//     sortingArr = ix.map((x) => sortingArr[x]);
-//     sortedArr = ix.map((x) => sortedArr[x]);
-
-//     return [sortingArr, sortedArr];
-// }
-
+//////////////////// Utilities color
 export function hexToHsv(hex) {
     let r = 0,
         g = 0,
@@ -336,16 +286,53 @@ export function hexToHsv(hex) {
     return [h * 360, s * 100, v * 100];
 }
 
-// export function randomColors(amount) {
-//     const randomColors = [];
-//     const letters = "0123456789ABCDEF";
+///////////////////// Utilities CLIP
+export async function getTextEmbeds(text) {
+    // Load tokenizer and text model
+    const tokenizer = await AutoTokenizer.from_pretrained(
+        "Xenova/clip-vit-base-patch32"
+    );
+    const text_model = await CLIPTextModelWithProjection.from_pretrained(
+        "Xenova/clip-vit-base-patch32"
+    );
 
-//     for (let i = 0; i < amount; i++) {
-//         let color = "#";
-//         for (let j = 0; j < 6; j++) {
-//             color += letters[Math.floor(Math.random() * 16)];
-//         }
-//         randomColors.push(color);
-//     }
-//     return randomColors;
-// }
+    // Run tokenization
+    const text_inputs = tokenizer(text, { padding: true, truncation: true });
+
+    // Compute embeddings
+    const { text_embeds } = await text_model(text_inputs);
+    const textEmbeddingArray = text_embeds.data;
+
+    const norm = Math.sqrt(
+        textEmbeddingArray.reduce((sum, val) => sum + val * val, 0)
+    );
+    const normalizedTextEmbeds = textEmbeddingArray.map((val) => val / norm);
+
+    return normalizedTextEmbeds;
+}
+
+export async function getImageEmbeds(imageElement) {
+    // Load processor and vision model
+    const processor = await AutoProcessor.from_pretrained(
+        "Xenova/clip-vit-base-patch32"
+    );
+    const vision_model = await CLIPVisionModelWithProjection.from_pretrained(
+        "Xenova/clip-vit-base-patch32"
+    );
+
+    // Process the image
+    const image = await RawImage.read(imageElement.src);
+    const image_inputs = await processor(image);
+
+    // Compute embeddings
+    const { image_embeds } = await vision_model(image_inputs);
+    const imageEmbeddingArray = image_embeds.data;
+
+    // Normalize the embeddings
+    const norm = Math.sqrt(
+        imageEmbeddingArray.reduce((sum, val) => sum + val * val, 0)
+    );
+    const normalizedImageEmbeds = imageEmbeddingArray.map((val) => val / norm);
+
+    return normalizedImageEmbeds;
+}

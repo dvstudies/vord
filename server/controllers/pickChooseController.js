@@ -1,4 +1,4 @@
-import { buildOpenSearchFilter } from "../utils.js";
+import { buildOpenSearchFilter } from "../utils/utils.js";
 
 export const pickChoosePost = async (req, res) => {
     try {

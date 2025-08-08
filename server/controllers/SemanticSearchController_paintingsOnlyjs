@@ -1,0 +1,70 @@
+import { buildOpenSearchFilter } from "../utils/utils.js";
+
+export const SemanticSearchPost = async (req, res) => {
+    try {
+        const { index, embeddings, size = 100, clauses } = req.body;
+
+        const client = req.app.locals.client;
+
+        if (!embeddings || !index) {
+            return res
+                .status(404)
+                .json({ error: "Unable to fetch data: undefined inputs" });
+        }
+
+        // Build the filter
+        const filter = buildOpenSearchFilter(clauses) || {
+            match_all: {},
+        };
+
+        const knnSearch = await client.search({
+            index,
+            body: {
+                size,
+                query: {
+                    bool: {
+                        must: [
+                            {
+                                knn: {
+                                    CLIP_embeddings: {
+                                        vector: embeddings,
+                                        k: size,
+                                        filter: {
+                                            bool: {
+                                                filter,
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        });
+
+        const hits = knnSearch.body.hits.hits;
+        const scores = hits.map((hit) => hit._score).sort((a, b) => a - b);
+
+        hits.forEach((hit) => {
+            hit._source._id = hit._id;
+            hit._source._score = hit._score;
+        });
+
+        const sources = hits.map((hit) => hit._source);
+
+        if (scores.length === 0) {
+            return res
+                .status(404)
+                .json({ error: "No results found for the given vector." });
+        }
+
+        res.json({
+            index,
+            distribution: sources,
+        });
+    } catch (err) {
+        console.error("Error in Semantic Search Controller:", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+};

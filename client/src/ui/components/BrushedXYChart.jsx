@@ -4,7 +4,7 @@ import {
     XYChart,
     AnimatedAxis,
     AreaSeries,
-    Grid,
+    AnimatedGrid,
     LineSeries,
     TooltipProvider,
     buildChartTheme,
@@ -120,7 +120,7 @@ export default function BrushedXYChart({
                                 clamp: true,
                             }}
                             theme={buildChartTheme({ ...theme })}
-                            margin={{ ...theme.margin, bottom: 50 }}
+                            margin={{ ...theme.margin }}
                         >
                             <LinearGradient
                                 id="area-gradient"
@@ -130,7 +130,7 @@ export default function BrushedXYChart({
                                 toOpacity={0}
                             />
 
-                            <Grid
+                            <AnimatedGrid
                                 columns
                                 rows
                                 lineStyle={{

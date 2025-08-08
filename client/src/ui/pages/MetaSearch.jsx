@@ -70,15 +70,8 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                     remapNumber(d.count, [min, max], [0.2, 1])
                 );
 
-                // d.color = randomColorDistance(
-                //     color,
-                //     1,
-                //     remapNumber(d.count, [min, max], [50, 0])
-                // );
                 d.active = true;
             });
-
-            // const colors = randomColorDistance
 
             setFilter({
                 cats: distribution.map((d) => d.label),
@@ -253,14 +246,6 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                         data={data}
                         color={color}
                         onClick={(label) => {
-                            console.log(
-                                "prevData",
-                                data,
-                                "filter",
-                                filter,
-                                "cats",
-                                filter.cats
-                            );
                             setData((prevData) => {
                                 if (
                                     prevData.distribution.filter(

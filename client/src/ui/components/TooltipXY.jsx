@@ -4,7 +4,7 @@ import { xAccessor, yAccessor } from "../../utils.js";
 import { Tooltip } from "@visx/xychart";
 import { shadows } from "@mui/system";
 
-export default function TooltipCard({ color }) {
+export default function TooltipCard({ color, legend = true }) {
     const theme = useTheme();
 
     return (
@@ -36,11 +36,12 @@ export default function TooltipCard({ color }) {
                             boxShadow: 3,
                         }}
                     >
-                        {Object.entries(datum).map(([key, value]) => (
-                            <div key={key}>
-                                <strong>{key}:</strong> {value}
-                            </div>
-                        ))}
+                        {legend &&
+                            Object.entries(datum).map(([key, value]) => (
+                                <div key={key}>
+                                    <strong>{key}:</strong> {value}
+                                </div>
+                            ))}
                     </Box>
                 ) : null;
             }}

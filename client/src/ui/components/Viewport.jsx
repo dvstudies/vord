@@ -59,22 +59,6 @@ export default function Viewport({ layout, input, canvas }) {
             }}
             // className="holomorphic"
         >
-            {/* white modal for transition */}
-            {/* <Box
-                sx={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    // width: "1000vw",
-                    // height: "100vh",
-
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    ...fadeS,
-                }}
-            >
-            </Box> */}
             <ModalLayered
                 zIndex={9}
                 bool={modalOn}
@@ -106,6 +90,7 @@ export default function Viewport({ layout, input, canvas }) {
                         : opacifyColor(layout.color, 0.4),
 
                     backdropFilter: "blur(5px)",
+                    zIndex: 2,
                 }}
             >
                 {input}
@@ -121,6 +106,7 @@ export default function Viewport({ layout, input, canvas }) {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
+                    zIndex: 1,
                 }}
             >
                 {canvas}

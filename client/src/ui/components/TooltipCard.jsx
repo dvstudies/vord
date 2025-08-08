@@ -6,6 +6,7 @@ export default function TooltipCard({
     color,
     image = null,
     onToolipClick,
+    legend = true,
 }) {
     const theme = useTheme();
 
@@ -50,15 +51,16 @@ export default function TooltipCard({
                         height: "auto",
                         maxHeight: 200,
                         borderRadius: 1,
-                        mb: 1,
+                        mb: legend ? 1 : 0,
                     }}
                 />
             )}
-            {Object.entries(vals).map(([key, value]) => (
-                <div key={key}>
-                    <strong>{key.replaceAll("_", " ")}:</strong> {value}
-                </div>
-            ))}
+            {legend &&
+                Object.entries(vals).map(([key, value]) => (
+                    <div key={key}>
+                        <strong>{key.replaceAll("_", " ")}:</strong> {value}
+                    </div>
+                ))}
         </Box>
     );
 }

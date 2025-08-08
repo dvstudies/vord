@@ -7,6 +7,7 @@ export default function ToggleButton({
     theme,
     onToggle,
     initial = false,
+    exclusive = false,
 }) {
     const [active, setActive] = useState(initial);
 
@@ -18,7 +19,7 @@ export default function ToggleButton({
 
     return (
         <Box
-            onClick={handleClick}
+            onClick={!(exclusive && active) ? handleClick : undefined}
             sx={{
                 cursor: "pointer",
                 px: 2,

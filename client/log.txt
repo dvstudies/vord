@@ -24,11 +24,15 @@
 # PickChoose -----------------------------------------------------------
 -   laggy behaviour when scroll is activated or any image is selected 
 -   abstract component and export them - clean file
+-   when selecting img, scroll is resetted
+
 
 # About --------------------------------------------------------------
-for the about fetch the readme from the vord repo parent
+-   for the about fetch the readme from the vord repo parent
 
 
+# Semantic Search -> Carousel -----------------------------------------
+-   for the fade-out fx, overlay div not fitting the gradient background
 
 
 

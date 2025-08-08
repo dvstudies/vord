@@ -1,17 +1,19 @@
 import express from "express";
 
-import { buildOpenSearchFilter } from "../utils.js";
+import { buildOpenSearchFilter } from "../utils/utils.js";
 import { sortPost } from "../controllers/sortController.js";
 import { metaSearchPost } from "../controllers/metaSearchController.js";
+import { clipSearchPost } from "../controllers/clipSearchController.js";
 import { pickChoosePost } from "../controllers/pickChooseController.js";
 import { colorWheelController } from "../controllers/colorWheelController.js";
 
 const router = express.Router();
 
-// router.get("/get/analyze/sort", sortGet);
 router.post("/post/analyze/sort", sortPost);
 router.post("/post/analyze/colorWheel", colorWheelController);
 router.post("/post/interpret/metaSearch", metaSearchPost);
+router.post("/post/interpret/semanticSearch", clipSearchPost);
+router.post("/post/inspect/imageSearch", clipSearchPost);
 router.post("/post/inspect/pickChoose", pickChoosePost);
 
 router.post("/post/filter", async (req, res) => {

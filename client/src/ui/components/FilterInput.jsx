@@ -24,16 +24,6 @@ export default function FilterInput({
             onChange={(e) => setInternalValue(e.target.value)}
             onKeyDown={handleKeyDown}
             size="small"
-            // InputProps={{
-            //     startAdornment: label ? (
-            //         <InputAdornment
-            //             position="start"
-            //             sx={{ color: theme.palette.white.darker }}
-            //         >
-            //             {label}
-            //         </InputAdornment>
-            //     ) : null,
-            // }}
             sx={{
                 width: "100%",
                 borderRadius: theme.brdRad,

@@ -9,6 +9,25 @@ export default function InputPanel({
     mainChildren,
     secondaryChildren,
 }) {
+    const formatTitle = (title) => {
+        if (title?.length > 10) {
+            const capitalLetters = title.match(/[A-Z]/g);
+            if (capitalLetters?.length >= 2) {
+                const secondCapitalIndex =
+                    title.slice(1).indexOf(capitalLetters[1]) + 1;
+                return (
+                    <>
+                        {title.slice(0, secondCapitalIndex)}
+                        <br />
+                        {title.slice(secondCapitalIndex)}
+                    </>
+                );
+            }
+        }
+        return title;
+    };
+
+    // const titleFormatted = formatTitle(config?.name);
     return (
         <>
             <Box
@@ -16,13 +35,14 @@ export default function InputPanel({
                     display: "flex",
                     justifyContent: "space-between",
                     width: "100%",
+                    zIndex: 1000,
                 }}
             >
                 <Typography
                     variant="h3"
                     sx={{ color }}
                 >
-                    {config?.name}
+                    {formatTitle(config?.name)}
                 </Typography>
                 <Tooltip
                     title={config?.info}
@@ -43,7 +63,7 @@ export default function InputPanel({
                 </Tooltip>
             </Box>
             {mainChildren}
-            {optionsOn && (
+            {optionsOn && secondaryChildren && (
                 <Box
                     sx={{
                         display: "flex",

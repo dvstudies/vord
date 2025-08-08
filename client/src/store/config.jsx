@@ -22,6 +22,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import CompositionIcon from "@mui/icons-material/SelectAll";
+import ImageSearchIcon from "@mui/icons-material/Quiz";
 
 // functions ---------------------------------------------------------------------------------------
 import PickChoose from "../ui/pages/PickChoose";
@@ -30,6 +31,7 @@ import SemanticSearch from "../ui/pages/SemanticSearch";
 import ColorWheel from "../ui/pages/ColorWheel";
 import Composition from "../ui/pages/Composition";
 import Sort from "../ui/pages/Sort";
+import ImageSearch from "../ui/pages/ImageSearch";
 
 // config ------------------------------------------------------------------------------------------
 
@@ -66,6 +68,11 @@ const actionBtns = {
 
             btns: [
                 {
+                    name: "imageSearch",
+                    icon: <ImageSearchIcon />,
+                    fn: ImageSearch,
+                },
+                {
                     name: "pickChoose",
                     icon: <SelectIcon />,
                     fn: PickChoose,
@@ -73,11 +80,6 @@ const actionBtns = {
                 {
                     name: "composition",
                     icon: <CompositionIcon />,
-                    fn: Composition,
-                },
-                {
-                    name: "download",
-                    icon: <DownloadIcon />,
                     fn: null,
                 },
             ],
@@ -91,11 +93,6 @@ const actionBtns = {
                     name: "metaSearch",
                     icon: <MetaSearchIcon />,
                     fn: MetaSearch,
-                },
-                {
-                    name: "timeRange",
-                    icon: <AccessTimeIcon />,
-                    fn: null,
                 },
                 {
                     name: "semanticSearch",
@@ -148,6 +145,8 @@ const info = {
 
     colorWheel:
         "Color Wheel arranges the collection in a circular layout based on the predominant colors of each entry. Hovering over an artwork reveals additional metadata, while a color bar chart displays the full palette and the proportional presence of each color. Users can interactively slice the wheel to interpret paintings with similar color affinities, providing a visually intuitive way to explore chromatic themes.",
+    imageSearch:
+        "Image Search uses CLIP embeddings to interpret the collection based on visual content. By entering a reference image, users retrieve paintings whose visual content aligns semantically with the input. A cosine similarity threshold can be adjusted to refine the precision or breadth of the results, offering a powerful way to search beyond keywords or metadata.",
 
     composition:
         "The Composition tool provides insight into the physical dimensions of each painting and, when segmentation masks are available, their spatial structure. It visualizes the relative position and shape of elements within the artwork, enabling users to interpret the collection based on compositional similarity—whether in terms of shape, layout, or spatial arrangement of visual features.",
