@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useMemo } from "react";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 import { useStore } from "../../store/useStore";
@@ -7,7 +7,7 @@ import { opacifyColor } from "../../utils.js";
 
 import About from "../pages/About.jsx";
 
-export default function Viewport({ layout, input, canvas, loading = true }) {
+export default function Viewport({ layout, input, canvas, loading = false }) {
     const theme = useTheme();
     const actionBtnFocus = useStore((state) => state.actionBtnFocus);
     const filtersHistory = useStore((state) => state.filtersHistory);
@@ -17,7 +17,8 @@ export default function Viewport({ layout, input, canvas, loading = true }) {
         ? ["transparent", opacifyColor(layout.color, 0.2)]
         : [];
 
-    const [idx, setIdx] = useState(0);
+    const [idx, setIdx] = useState(1);
+    const [loadingBlur, setLoadingBlur] = useState(0);
 
     const ratios = {
         column: {
@@ -45,9 +46,13 @@ export default function Viewport({ layout, input, canvas, loading = true }) {
 
     useEffect(() => {
         if (!loading) return;
-        setIdx(0); // reset when (re)entering loading
 
-        const id = setInterval(() => setIdx((i) => 1 - i), 1000);
+        setLoadingBlur(10); // reset when (re)entering loading
+
+        const id = setInterval(
+            () => setLoadingBlur(Math.random() * 100 + 20),
+            500
+        );
         return () => clearInterval(id);
     }, [loading]);
 
@@ -69,23 +74,35 @@ export default function Viewport({ layout, input, canvas, loading = true }) {
             }}
             // className="holomorphic"
         >
+            {/* modals - about - actionbtns - loading */}
             <ModalLayered
                 zIndex={9}
                 bool={modalOn}
                 blur={100}
             />
-
             <ModalLayered
                 zIndex={100}
                 bool={actionBtnFocus}
+                onClick={() => useStore.setState({ actionBtnFocus: false })}
             />
-
-            {loading && layout?.color && (
+            {layout && (
                 <ModalLayered
-                    zIndex={2}
+                    zIndex={100}
                     bool={loading}
-                    blur={100}
-                    backgroundColor={loadingBg[idx]}
+                    blur={loadingBlur}
+                    backgroundColor={opacifyColor(layout?.color, 0.2)}
+                    text={
+                        <Typography
+                            variant="h4"
+                            color="white"
+                            sx={{
+                                opacity: loading ? 1 : 0,
+                                transition: `all .3s ease-out`,
+                            }}
+                        >
+                            Loading...
+                        </Typography>
+                    }
                 />
             )}
 
@@ -141,6 +158,8 @@ function ModalLayered({
     timeDuration = 0.3,
     blur = 10,
     backgroundColor = "rgba(0, 0, 0, 0.2)",
+    onClick = null,
+    text = <></>,
 }) {
     return (
         <Box
@@ -158,7 +177,9 @@ function ModalLayered({
                 pointerEvents: bool ? "auto" : "none",
                 transition: `all ${timeDuration}s ease-out`,
             }}
-            onClick={() => useStore.setState({ actionBtnFocus: false })}
-        ></Box>
+            onClick={onClick}
+        >
+            {text}
+        </Box>
     );
 }

@@ -5,6 +5,8 @@ import { useTheme } from "@mui/material/styles";
 
 import { opacifyColor } from "../../utils.js";
 
+import ImageMagnifier from "./ImageMagnifier.jsx";
+
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
@@ -152,7 +154,9 @@ export default function Carousel({ index, data, color, onEnd }) {
                             ...buttonS,
                         }}
                         onClick={() => {
-                            setActiveId((prev) => Math.max(prev - 1, 0));
+                            const newId = Math.max(activeId - 1, 0);
+                            setActiveId(newId);
+                            onEnd(newId);
                         }}
                     >
                         <ArrowBackIcon />
@@ -162,9 +166,12 @@ export default function Carousel({ index, data, color, onEnd }) {
                             ...buttonS,
                         }}
                         onClick={() => {
-                            setActiveId((prev) =>
-                                Math.min(prev + 1, data.length - 1)
+                            const newId = Math.min(
+                                activeId + 1,
+                                data.length - 1
                             );
+                            setActiveId(newId);
+                            onEnd(newId);
                         }}
                     >
                         <ArrowForwardIcon />
@@ -200,7 +207,6 @@ function CarouselImage({
     onHover,
 }) {
     const [naturalSize, setNaturalSize] = useState({ w: 1, h: 1 });
-    const [maskSize, setMaskSize] = useState({ w: 1, h: 1 });
     const [loaded, setLoaded] = useState(false);
 
     const getMaxDimension = () => {
@@ -220,15 +226,6 @@ function CarouselImage({
     const activeSize =
         loaded && loaded !== "error" ? getMaxDimension() : { ...inactiveSize };
 
-    useEffect(() => {
-        if (item?.mask) {
-            const { w, h } = naturalSize;
-            setMaskSize({
-                w: (item.mask.width * 100) / w,
-                h: (item.mask.height * 100) / h,
-            });
-        }
-    }, [naturalSize]);
     return (
         <>
             <motion.div
@@ -254,7 +251,7 @@ function CarouselImage({
                     damping: 30,
                 }}
                 onClick={clickedIndex}
-                onHoverStart={() => onHover(true)}
+                onHoverStart={() => onHover(active && true)}
                 onHoverEnd={() => onHover(false)}
             >
                 <div

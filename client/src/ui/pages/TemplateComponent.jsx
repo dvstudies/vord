@@ -11,6 +11,8 @@ import { useStore } from "../../store/useStore";
 export default function Name({ color, config, schema, metadata, call }) {
     const theme = useTheme();
     const ratio = "column"; // or "square"
+    const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [selected, setSelected] = useState("");
     const [data, setData] = useState([]);
@@ -21,8 +23,12 @@ export default function Name({ color, config, schema, metadata, call }) {
 
     useEffect(() => {
         if (selected === "") return;
+        setLoading(true);
 
-        getBackend(config.api, {}).then(setData);
+        getBackend(config.api, {}).then((res) => {
+            setData(res);
+            setLoading(false);
+        });
     }, [selected]);
 
     useEffect(() => {
@@ -87,6 +93,7 @@ export default function Name({ color, config, schema, metadata, call }) {
                 layout={{ ratio: ratio, color: color }}
                 input={<Input />}
                 canvas={<Canvas />}
+                loading={loading}
             />
         </>
     );
