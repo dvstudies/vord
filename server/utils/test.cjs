@@ -24,7 +24,7 @@ const client = new Client({
     },
 });
 
-console.log(client);
+// console.log(client);
 
 client
     .search({
@@ -57,7 +57,7 @@ client
         },
     })
     .then((response) => {
-        console.log("🎨 Documents in 'paintings' index:");
+        console.log("🎨 Documents in 'masks' index:");
         response.body.hits.hits.forEach((hit, i) => {
             console.log(`${i + 1}.`, hit._source);
         });

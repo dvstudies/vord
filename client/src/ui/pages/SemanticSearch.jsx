@@ -30,6 +30,7 @@ export default function SemanticSearch({
     const theme = useTheme();
     const ratio = "column"; // or "square"
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [prompt, setPrompt] = useState(metadata.prompt || "");
     const [OSIndex, setOSIndex] = useState(metadata.OSIndex || "paintings");
@@ -59,6 +60,8 @@ export default function SemanticSearch({
         setFilter({ index: 0, threshold: null, ids: [] });
         resetClause();
 
+        setLoading(true);
+
         // Extract clip embeddings
         getTextEmbeds(prompt).then((embeddings) => {
             const textEmbeds = Array.from(embeddings);
@@ -73,6 +76,7 @@ export default function SemanticSearch({
             }).then((res) => {
                 console.log(res);
                 setData(res);
+                setLoading(false);
             });
         });
     }, [prompt, OSIndex, clauses]);
@@ -251,6 +255,7 @@ export default function SemanticSearch({
                 layout={{ ratio: ratio, color: color }}
                 input={<Input />}
                 canvas={<Canvas />}
+                loading={loading}
             />
         </>
     );

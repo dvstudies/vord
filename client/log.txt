@@ -35,6 +35,10 @@
 -   for the fade-out fx, overlay div not fitting the gradient background
 
 
+# Color -----------------------------------------
+-   selection crossing 0 angles cancel negative degs
+
+
 
 
 

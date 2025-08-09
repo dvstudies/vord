@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { Grid, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
@@ -7,12 +7,17 @@ import { opacifyColor } from "../../utils.js";
 
 import About from "../pages/About.jsx";
 
-export default function Viewport({ layout, input, canvas }) {
+export default function Viewport({ layout, input, canvas, loading = true }) {
     const theme = useTheme();
     const actionBtnFocus = useStore((state) => state.actionBtnFocus);
     const filtersHistory = useStore((state) => state.filtersHistory);
     const mainViewRef = useRef(null);
     const modalOn = useStore((state) => state.modalOn);
+    const loadingBg = layout
+        ? ["transparent", opacifyColor(layout.color, 0.2)]
+        : [];
+
+    const [idx, setIdx] = useState(0);
 
     const ratios = {
         column: {
@@ -38,22 +43,27 @@ export default function Viewport({ layout, input, canvas }) {
         }
     }, [mainViewRef]);
 
+    useEffect(() => {
+        if (!loading) return;
+        setIdx(0); // reset when (re)entering loading
+
+        const id = setInterval(() => setIdx((i) => 1 - i), 1000);
+        return () => clearInterval(id);
+    }, [loading]);
+
     return (
         <Box
             ref={mainViewRef}
             sx={{
                 ...theme.viewportS,
-
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "flex-start",
                 alignItems: "flex-start",
                 border: `solid 0.1px ${theme.palette.white.darker}`,
-
                 borderRadius: theme.brdRad,
                 backgroundImage: "linear-gradient(45deg, #000000, #222222)",
                 backgroundSize: "400% 400%",
-
                 overflow: "hidden",
                 position: "relative",
             }}
@@ -64,10 +74,20 @@ export default function Viewport({ layout, input, canvas }) {
                 bool={modalOn}
                 blur={100}
             />
+
             <ModalLayered
                 zIndex={100}
                 bool={actionBtnFocus}
             />
+
+            {loading && layout?.color && (
+                <ModalLayered
+                    zIndex={2}
+                    bool={loading}
+                    blur={100}
+                    backgroundColor={loadingBg[idx]}
+                />
+            )}
 
             {/* viewport content */}
             <Box
@@ -115,7 +135,13 @@ export default function Viewport({ layout, input, canvas }) {
     );
 }
 
-function ModalLayered({ zIndex, bool, timeDuration = 0.3, blur = 10 }) {
+function ModalLayered({
+    zIndex,
+    bool,
+    timeDuration = 0.3,
+    blur = 10,
+    backgroundColor = "rgba(0, 0, 0, 0.2)",
+}) {
     return (
         <Box
             sx={{
@@ -127,9 +153,7 @@ function ModalLayered({ zIndex, bool, timeDuration = 0.3, blur = 10 }) {
                 alignItems: "center",
                 opacity: bool ? 1 : 0,
                 backdropFilter: bool ? `blur(${blur}px)` : "blur(0px)",
-                backgroundColor: "rgba(0, 0, 0, 0.2)",
-                // ? "rgba(0, 0, 0, 0.2)"
-                // : "rgba(10,10,10, 0.2)",
+                backgroundColor: backgroundColor,
                 zIndex: zIndex,
                 pointerEvents: bool ? "auto" : "none",
                 transition: `all ${timeDuration}s ease-out`,

@@ -25,6 +25,7 @@ export default function ImageSearch({ color, config, schema, metadata, call }) {
     const theme = useTheme();
     const ratio = "column"; // or "square"
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [imgInput, setImgInput] = useState(metadata.imgInput || null);
     const [OSIndex, setOSIndex] = useState(metadata.OSIndex || "paintings");
@@ -51,6 +52,7 @@ export default function ImageSearch({ color, config, schema, metadata, call }) {
         // Reset filter when column changes
         setFilter({ index: 0, threshold: null, ids: [] });
         resetClause();
+        setLoading(true);
 
         // Extract clip embeddings
         getImageEmbeds(imgInput.imageElement).then((embeddings) => {
@@ -65,6 +67,7 @@ export default function ImageSearch({ color, config, schema, metadata, call }) {
                 clauses: clauses,
             }).then((res) => {
                 setData(res);
+                setLoading(false);
             });
         });
     }, [imgInput, OSIndex]);
@@ -243,6 +246,7 @@ export default function ImageSearch({ color, config, schema, metadata, call }) {
                 layout={{ ratio: ratio, color: color }}
                 input={<Input />}
                 canvas={<Canvas />}
+                loading={loading}
             />
         </>
     );

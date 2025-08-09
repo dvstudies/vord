@@ -30,7 +30,16 @@
                 "color_palette": { "type": "text" },
                 "dominant_color": { "type": "text" },
                 "palette_count": { "type": "integer" },
-                "CLIP_embeddings": { "type": "knn_vector", "dimension": 512 }
+                "CLIP_embeddings": {
+                    "type": "knn_vector",
+                    "dimension": 512,
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "lucene",
+                        "parameters": { "ef_construction": 128, "m": 16 }
+                    }
+                }
             }
         }
     },
@@ -52,7 +61,16 @@
                 "mask_id": { "type": "integer" },
                 "omni_id": { "type": "integer" },
                 "region": { "type": "integer" },
-                "CLIP_embeddings": { "type": "knn_vector", "dimension": 512 }
+                "CLIP_embeddings": {
+                    "type": "knn_vector",
+                    "dimension": 512,
+                    "method": {
+                        "name": "hnsw",
+                        "space_type": "cosinesimil",
+                        "engine": "lucene",
+                        "parameters": { "ef_construction": 128, "m": 16 }
+                    }
+                }
             }
         }
     }

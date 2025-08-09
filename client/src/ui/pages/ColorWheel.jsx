@@ -16,6 +16,7 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
     const theme = useTheme();
     const ratio = "column"; // or "square"
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [selected, setSelected] = useState(metadata.selected || "hue");
     const [order, setOrder] = useState(metadata.order || "lightness");
@@ -48,6 +49,7 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
         // Reset filter when column changes
         // setFilter([0, 360]);
         resetClause();
+        setLoading(true);
 
         postBackend(config.api, {
             index: config.componentIndex,
@@ -56,6 +58,7 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
             clauses: clauses,
         }).then((res) => {
             setData(res);
+            setLoading(false);
         });
     }, [selected]);
 
@@ -264,6 +267,7 @@ export default function ColorWheel({ color, config, schema, metadata, call }) {
                 layout={{ ratio: ratio, color: color }}
                 input={<Input />}
                 canvas={<Canvas />}
+                loading={loading}
             />
         </>
     );

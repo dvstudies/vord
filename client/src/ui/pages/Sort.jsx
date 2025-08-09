@@ -17,6 +17,7 @@ export default function Sort({ color, config, schema, metadata, call }) {
     const columns = useStore((state) => state.columns);
     const ratio = "column";
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [selected, setSelected] = useState(metadata.selected || "");
     const [filter, setFilter] = useState(
@@ -40,6 +41,7 @@ export default function Sort({ color, config, schema, metadata, call }) {
         // Reset filter when column changes
         setFilter({ min: "", max: "" });
         resetClause();
+        setLoading(true);
 
         const columnType = schema.mappings.properties[selected]?.type;
 
@@ -51,6 +53,7 @@ export default function Sort({ color, config, schema, metadata, call }) {
             clauses: clauses,
         }).then((res) => {
             setData(res);
+            setLoading(false);
         });
     }, [selected]);
 
@@ -144,6 +147,7 @@ export default function Sort({ color, config, schema, metadata, call }) {
             layout={{ ratio, color }}
             input={<Input />}
             canvas={<Canvas />}
+            loading={loading}
         />
     );
 }

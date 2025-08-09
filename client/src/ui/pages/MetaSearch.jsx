@@ -23,6 +23,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
     const columns = useStore((state) => state.columns);
     const ratio = "column"; // or "square"
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [selected, setSelected] = useState(metadata.selected || "");
     const [filter, setFilter] = useState(metadata.filter || { cats: [] });
@@ -44,6 +45,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
         // Reset filter when column changes
         setFilter({ cats: [] });
         resetClause();
+        setLoading(true);
 
         const columnType = schema.mappings.properties[selected]?.type;
 
@@ -78,6 +80,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
             });
 
             setData(res);
+            setLoading(false);
         });
     }, [selected]);
 
@@ -309,6 +312,7 @@ export default function MetaSearch({ color, config, schema, metadata, call }) {
                 layout={{ ratio: ratio, color: color }}
                 input={<Input />}
                 canvas={<Canvas />}
+                loading={loading}
             />
         </>
     );

@@ -27,6 +27,7 @@ export default function PickChoose({
     const theme = useTheme();
     const ratio = "column";
     const clauses = useStore((state) => state.clauses);
+    const [loading, setLoading] = useState(false);
 
     const [entry, setEntry] = useState(metadata.entry || null);
     const [filter, setFilter] = useState(metadata.filter || { ids: new Set() });
@@ -53,6 +54,8 @@ export default function PickChoose({
     // Initial load
     useEffect(() => {
         if (entry !== null) return;
+        setLoading(true);
+
         postBackend(config.api, {
             index: config.componentIndex,
             size: visibleItemsCount,
@@ -60,6 +63,7 @@ export default function PickChoose({
         }).then((res) => {
             setData(res);
             setVisibleItemsCount((prev) => prev + increment);
+            setLoading(false);
         });
     }, [clauses]);
 
@@ -186,6 +190,7 @@ export default function PickChoose({
             layout={{ ratio: ratio, color: color }}
             input={<Input />}
             canvas={<Canvas />}
+            loading={loading}
         />
     );
 }
