@@ -1,3 +1,7 @@
+body {
+    background-color: white;
+}
+
 body,
 #root {
     margin: 0;
@@ -6,7 +10,6 @@ body,
     height: 100vh;
     max-height: 100vh;
     overflow: clip;
-    /* background-color: #ebebeb; */
 
     /* font-size: 0.8rem; */
     /* box-sizing: content-box; */
